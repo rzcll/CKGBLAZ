@@ -1,0 +1,704 @@
+import React, { useState, useEffect } from 'react';
+import { FolderUp, FileSpreadsheet, Download, RefreshCw, CheckCircle, ChevronRight, Sparkles, Settings2, FileOutput, Lock, User, Save, LogOut } from 'lucide-react';
+
+export default function App() {
+  const [files, setFiles] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [resultData, setResultData] = useState([]);
+  const [isXlsxLoaded, setIsXlsxLoaded] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+
+  // State untuk input manual kolom F, G, H
+  const [inputF, setInputF] = useState('');
+  const [inputG, setInputG] = useState('');
+  const [inputH, setInputH] = useState('');
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [akun, setAkun] = useState('');
+  const [isLoadingLogin, setIsLoadingLogin] = useState(false);
+  const [loginError, setLoginError] = useState(''); 
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('');
+
+  // 👇 GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA NANTINYA 👇
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbya7z3VYbd6gGpLkw2OxCH8U8I3bxuJBf2Zgjhb_cYFgr1mAKwqA0FGvRSEp8Uq_Owo_Q/exec'; 
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setAkun('');
+    setFiles([]);
+    setResultData([]);
+    setProgress(0);
+    setInputF('');
+    setInputG('');
+    setInputH('');
+    setUploadError('');
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (akun.trim() !== '') {
+      setIsLoadingLogin(true);
+      setLoginError('');
+
+      if (GAS_URL !== '') {
+        try {
+          const response = await fetch(GAS_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/plain;charset=utf-8',
+            },
+            body: JSON.stringify({ action: 'getTemplate', akun: akun })
+          });
+          const resData = await response.json();
+          
+          if (resData.status === 'success' && resData.data) {
+            setInputF(resData.data.nilaiF || '');
+            setInputG(resData.data.nilaiG || '');
+            setInputH(resData.data.nilaiH || '');
+            setIsLoggedIn(true); 
+          } else if (resData.status === 'not_found') {
+            setLoginError('Nama Akun tidak terdaftar di sistem!');
+          } else {
+            setLoginError('Terjadi kesalahan pada server.');
+          }
+        } catch (error) {
+          console.error('Gagal mengambil data template:', error);
+          setLoginError('Gagal terhubung ke database. Periksa URL GAS Anda.');
+        }
+      } else {
+        await new Promise(r => setTimeout(r, 1000));
+        setIsLoggedIn(true);
+      }
+
+      setIsLoadingLogin(false);
+    }
+  };
+
+  const handleSaveTemplate = async () => {
+    setIsSaving(true);
+    setSaveStatus('Menyimpan ke DB...');
+    
+    if (typeof google !== 'undefined' && google.script) {
+      google.script.run
+        .withSuccessHandler(() => {
+          setIsSaving(false);
+          setSaveStatus('Berhasil disimpan!');
+          setTimeout(() => setSaveStatus(''), 3000);
+        })
+        .withFailureHandler((err) => {
+          setIsSaving(false);
+          setSaveStatus('Gagal menyimpan.');
+        })
+        .simpanKeSpreadsheet(akun, inputF, inputG, inputH);
+    } 
+    else if (GAS_URL !== '') {
+      try {
+        await fetch(GAS_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+          },
+          body: JSON.stringify({ 
+            action: 'simpan', 
+            akun: akun, 
+            nilaiF: inputF, 
+            nilaiG: inputG, 
+            nilaiH: inputH 
+          })
+        });
+        setIsSaving(false);
+        setSaveStatus('Tersimpan di Spreadsheet!');
+        setTimeout(() => setSaveStatus(''), 3000);
+      } catch (error) {
+        setIsSaving(false);
+        setSaveStatus('Gagal koneksi server.');
+      }
+    } 
+    else {
+      setTimeout(() => {
+        setIsSaving(false);
+        setSaveStatus('Tersimpan (Mode Lokal)');
+        setTimeout(() => setSaveStatus(''), 3000);
+      }, 1500);
+    }
+  };
+
+  useEffect(() => {
+    if (!window.XLSX) {
+      const script = document.createElement('script');
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+      script.async = true;
+      script.onload = () => setIsXlsxLoaded(true);
+      document.body.appendChild(script);
+    } else {
+      setIsXlsxLoaded(true);
+    }
+  }, []);
+
+  const handleFileSelect = (e) => {
+    const selectedFiles = Array.from(e.target.files).filter(f => 
+      f.name.endsWith('.xlsx') || f.name.endsWith('.xls') || f.name.endsWith('.csv')
+    );
+    setFiles(selectedFiles);
+    setResultData([]);
+    setProgress(0);
+    setUploadError(''); 
+  };
+
+  const readFile = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = window.XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const json = window.XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          resolve(json);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = (err) => reject(err);
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const processRow = (row) => {
+    const out = new Array(21).fill(''); 
+
+    const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
+
+    const toTitleCase = (str) => {
+      if (!str) return '';
+      return str.toLowerCase().split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join(' ');
+    };
+
+    const formatDate = (val) => {
+      if (val == null || val === '') return '';
+      if (!isNaN(val) && Number(val) > 10000 && Number(val) < 80000) {
+        const date = new Date(Math.round((Number(val) - 25569) * 86400 * 1000));
+        const d = String(date.getUTCDate()).padStart(2, '0');
+        const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const y = String(date.getUTCFullYear());
+        return `${d}/${m}/${y}`;
+      }
+      
+      let str = String(val).trim();
+      if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(str)) { 
+        const parts = str.split(/[-/]/);
+        return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+      }
+      if (/^\d{1,2}[-/]\d{1,2}[-/]\d{4}$/.test(str)) { 
+        const parts = str.split(/[-/]/);
+        return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+      }
+      return str.replace(/-/g, '/');
+    };
+
+    out[0] = getVal(0);     
+    out[1] = getVal(4);     
+    out[2] = toTitleCase(getVal(2)); 
+    out[3] = formatDate(row[17]); 
+    out[4] = getVal(8);     
+    out[5] = inputF;        
+    out[6] = inputG;        
+    out[7] = inputH;        
+    out[8] = getVal(15);    
+
+    const pVal = getVal(15);
+    out[9] = pVal ? `Desa ${pVal}` : '';  
+    
+    out[12] = getVal(37);   
+
+    const bl = getVal(63).toUpperCase();
+    const bo = getVal(66).toUpperCase();
+    const br = getVal(69).toUpperCase();
+    const diagCols = [bl, bo, br];
+
+    const nMatches = [];
+    const nRegex = /(I10|I11)/ig;
+    diagCols.forEach(d => {
+      const matches = d.match(nRegex);
+      if (matches) nMatches.push(...matches);
+    });
+    out[13] = nMatches.length > 0 ? 'Ya' : 'Tidak';
+
+    const oMatches = [];
+    const oRegex = /E11(\.[1-9])?/ig;
+    diagCols.forEach(d => {
+      const matches = d.match(oRegex);
+      if (matches) oMatches.push(...matches);
+    });
+    out[14] = oMatches.length > 0 ? 'Ya' : 'Tidak';
+
+    const ayVal = getVal(50);
+    out[15] = ayVal.replace(/\D/g, '');   
+    
+    const azVal = getVal(51);
+    let qVal = azVal.split(',')[0];
+    if (qVal === azVal && azVal.includes('.')) {
+      qVal = azVal.split('.')[0];
+    }
+    out[16] = qVal.replace(/\D/g, '');   
+    
+    const baVal = getVal(52);
+    out[17] = baVal.replace(/\D/g, '');   
+
+    const bdVal = getVal(55); 
+    out[18] = bdVal.replace(/\D/g, ''); 
+
+    const beVal = getVal(56);
+    out[19] = beVal.replace(/\D/g, ''); 
+    
+    out[20] = ''; 
+
+    return out;
+  };
+
+  const processAllFiles = async () => {
+    setIsProcessing(true);
+    setUploadError('');
+    let allProcessedData = [];
+    let hasValidationError = false;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        const json = await readFile(file);
+        
+        // Validasi Sel A3
+        const cellA3 = (json[2] && json[2][0]) ? String(json[2][0]).trim().toLowerCase() : '';
+        const currentAkun = akun.trim().toLowerCase();
+
+        if (!cellA3.includes(currentAkun)) {
+          setUploadError(`File "${file.name}" ditolak! Sel A3 tidak memuat data yang relevan dengan akun (${akun}).`);
+          hasValidationError = true;
+          break; 
+        }
+        
+        for (let r = 26; r < json.length; r++) {
+          const row = json[r];
+          if (!row || row.length === 0 || row.every(cell => cell == null || cell === '')) continue;
+          
+          if (row[4] == null || String(row[4]).trim() === '') continue;
+          
+          const processedDataRow = processRow(row);
+          
+          let skipRow = false;
+          const dobString = processedDataRow[3];
+          if (dobString) {
+            const parts = String(dobString).split('/');
+            if (parts.length === 3) {
+              const birthDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+              if (!isNaN(birthDate.getTime())) {
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const mDiff = today.getMonth() - birthDate.getMonth();
+                if (mDiff < 0 || (mDiff === 0 && today.getDate() < birthDate.getDate())) {
+                  age--;
+                }
+                
+                // Jika usia 7 s/d 18 tahun, abaikan
+                if (age >= 7 && age <= 18) {
+                  skipRow = true;
+                }
+              }
+            }
+          }
+          
+          if (skipRow) continue;
+          
+          allProcessedData.push(processedDataRow);
+        }
+      } catch (err) {
+        console.error(`Gagal memproses file ${file.name}`, err);
+      }
+      setProgress(Math.round(((i + 1) / files.length) * 100));
+    }
+
+    if (hasValidationError) {
+      setIsProcessing(false);
+      setResultData([]);
+      setProgress(0);
+      return;
+    }
+
+    setResultData(allProcessedData);
+    setIsProcessing(false);
+  };
+
+  const downloadCSV = () => {
+    const worksheet = window.XLSX.utils.aoa_to_sheet(resultData);
+    const csvOutput = window.XLSX.utils.sheet_to_csv(worksheet);
+    const blob = new Blob([csvOutput], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "DataCKGUmum.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const outputHeaders = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U"];
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-[#dcfce7] flex items-center justify-center relative overflow-hidden font-sans p-4 selection:bg-emerald-200">
+        <div className="absolute top-0 left-0 w-full h-80 bg-[#064e3b] shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-0"></div>
+        
+        <div className="bg-white p-8 md:p-10 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] w-full max-w-md relative z-10 border border-emerald-50">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center p-4 bg-[#064e3b] rounded-2xl shadow-[0_15px_30px_rgba(0,0,0,0.4)] mb-4 border border-[#047857]">
+              <Lock className="w-8 h-8 text-emerald-300" />
+            </div>
+            <h1 className="text-3xl font-black text-[#022c22] tracking-tight">Login Portal</h1>
+            <p className="text-emerald-700 font-bold text-sm mt-2">Filter CKG BLAZ Workspace</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2">
+              <label className="block text-xs font-black text-emerald-800 uppercase tracking-wide">Nama Akun</label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
+                <input 
+                  type="text" 
+                  required
+                  value={akun}
+                  onChange={(e) => setAkun(e.target.value)}
+                  disabled={isLoadingLogin}
+                  placeholder="Masukkan nama akun..."
+                  className="w-full pl-12 pr-4 py-3.5 bg-[#f0fdf4] border border-emerald-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#059669] focus:border-transparent outline-none transition-all shadow-[inset_0_2px_6px_rgba(0,0,0,0.05)] text-sm font-bold text-emerald-900 disabled:opacity-50"
+                />
+              </div>
+              {loginError && (
+                <p className="text-red-500 text-xs font-bold mt-2 animate-pulse">{loginError}</p>
+              )}
+            </div>
+
+            <button 
+              type="submit"
+              disabled={isLoadingLogin}
+              className="w-full mt-4 bg-[#10b981] hover:bg-[#059669] disabled:bg-emerald-800 text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_10px_25px_rgba(16,185,129,0.5)] hover:shadow-[0_15px_35px_rgba(16,185,129,0.7)] disabled:shadow-none"
+            >
+              {isLoadingLogin ? (
+                <>
+                  <RefreshCw className="w-5 h-5 animate-spin" />
+                  Mencari Data Akun...
+                </>
+              ) : (
+                <>
+                  Masuk ke Aplikasi
+                  <ChevronRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#dcfce7] relative overflow-hidden font-sans text-emerald-950 pb-16 selection:bg-emerald-200">
+      
+      <div className="absolute top-0 left-0 w-full h-80 bg-[#064e3b] shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-0"></div>
+
+      <div className="max-w-6xl mx-auto space-y-8 p-6 relative z-10 pt-8">
+        
+        {/* Header Profil & Logout */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-2">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#10b981]/20 rounded-lg border border-[#34d399]/30">
+              <Sparkles className="w-5 h-5 text-[#34d399]" />
+            </div>
+            <h1 className="text-xl font-bold text-white tracking-tight">Data Workspace</h1>
+          </div>
+          <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-[#34d399]" />
+              <span className="text-sm font-medium text-emerald-50">{akun}</span>
+            </div>
+            <div className="w-px h-4 bg-white/20"></div>
+            <button 
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-sm font-semibold text-red-300 hover:text-red-200 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Keluar
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white p-8 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group border border-emerald-50">
+          <div className="absolute top-0 left-0 w-2 h-full bg-[#10b981]"></div>
+          <div className="text-center md:text-left pl-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#064e3b] text-white text-xs font-bold tracking-widest uppercase mb-4 shadow-[0_10px_25px_rgba(0,0,0,0.4)]">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+              Pro Workspace
+            </div>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#022c22] mb-2">
+              Filter CKG <span className="text-[#059669]">BLAZ</span>
+            </h1>
+            <p className="text-emerald-700 text-sm max-w-lg leading-relaxed font-semibold">
+              Sistem filter data cerdas untuk Blaz CKG
+            </p>
+          </div>
+          <div className="p-5 bg-emerald-50 rounded-2xl shadow-[inset_0_2px_15px_rgba(0,0,0,0.08)] border border-emerald-100 transform group-hover:scale-105 transition-transform duration-500">
+            <FileSpreadsheet className="w-14 h-14 text-[#059669]" />
+          </div>
+        </div>
+
+        {!isXlsxLoaded && (
+          <div className="bg-white p-4 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.4)] border-l-4 border-amber-500 text-emerald-800 text-sm flex items-center gap-3 font-bold">
+            <RefreshCw className="w-5 h-5 animate-spin text-amber-500" />
+            Menginisialisasi Engine Pemroses Data...
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white p-7 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] h-full flex flex-col border border-emerald-50">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-emerald-100">
+                <div className="p-2.5 bg-[#064e3b] rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.4)] text-white">
+                  <Settings2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#022c22]">Sisipkan Data</h3>
+                  <p className="text-[11px] text-emerald-600 font-bold leading-tight mt-1">Lengkapi dan sesuaikan data Provinsi, Kabupaten dan Kecamatan</p>
+                </div>
+              </div>
+              
+              <div className="space-y-5 flex-1">
+                {[
+                  { id: 'F', label: 'Provinsi', val: inputF, setter: setInputF },
+                  { id: 'G', label: 'Kabupaten', val: inputG, setter: setInputG },
+                  { id: 'H', label: 'Kecamatan', val: inputH, setter: setInputH }
+                ].map((col) => (
+                  <div key={col.id} className="group">
+                    <label className="block text-xs font-black text-emerald-800 mb-2 uppercase tracking-wide">
+                      {col.label}
+                    </label>
+                    <input
+                      type="text"
+                      value={col.val}
+                      onChange={(e) => col.setter(e.target.value)}
+                      placeholder={`Ketik ${col.label}...`}
+                      className="w-full px-4 py-3 bg-[#f0fdf4] border border-emerald-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#059669] focus:border-transparent outline-none transition-all shadow-[inset_0_2px_6px_rgba(0,0,0,0.05)] text-sm font-bold text-emerald-900 placeholder-emerald-400"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 pt-5 border-t border-emerald-100">
+                <button
+                  onClick={handleSaveTemplate}
+                  disabled={isSaving}
+                  className="w-full bg-[#064e3b] hover:bg-[#022c22] disabled:bg-emerald-800 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.4)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.5)] disabled:shadow-none"
+                >
+                  {isSaving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                  {saveStatus || 'Simpan Template ke DB'}
+                </button>
+                <p className="text-[11px] text-center mt-3 text-emerald-700 font-bold uppercase tracking-wider">
+                  Sesi berjalan sebagai: <span className="text-[#059669] font-black">{akun}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white p-7 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] flex flex-col justify-center h-full border border-emerald-50">
+              
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                {/* Upload Folder */}
+                <div className="border-2 border-dashed border-emerald-300 hover:border-[#059669] bg-[#f0fdf4] hover:bg-emerald-50 transition-all duration-300 rounded-2xl p-6 text-center group relative overflow-hidden cursor-pointer flex-1">
+                  <input
+                    type="file"
+                    webkitdirectory="true"
+                    directory="true"
+                    multiple
+                    onChange={handleFileSelect}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                    id="folder-upload"
+                    disabled={isProcessing || !isXlsxLoaded}
+                  />
+                  <div className={`flex flex-col items-center justify-center space-y-3 relative z-10 ${(!isXlsxLoaded || isProcessing) && 'opacity-50'}`}>
+                    <div className="w-16 h-16 bg-[#064e3b] shadow-[0_15px_35px_rgba(0,0,0,0.4)] rounded-2xl flex items-center justify-center transform group-hover:-translate-y-2 group-hover:shadow-[0_25px_45px_rgba(0,0,0,0.5)] transition-all duration-300 border border-[#047857]">
+                      <FolderUp className="w-8 h-8 text-emerald-50" />
+                    </div>
+                    <div>
+                      <span className="text-lg font-black text-[#022c22] group-hover:text-[#059669] transition-colors">
+                        Pilih Folder
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Upload File */}
+                <div className="border-2 border-dashed border-emerald-300 hover:border-[#059669] bg-[#f0fdf4] hover:bg-emerald-50 transition-all duration-300 rounded-2xl p-6 text-center group relative overflow-hidden cursor-pointer flex-1">
+                  <input
+                    type="file"
+                    multiple
+                    accept=".xlsx, .xls, .csv"
+                    onChange={handleFileSelect}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                    id="file-upload"
+                    disabled={isProcessing || !isXlsxLoaded}
+                  />
+                  <div className={`flex flex-col items-center justify-center space-y-3 relative z-10 ${(!isXlsxLoaded || isProcessing) && 'opacity-50'}`}>
+                    <div className="w-16 h-16 bg-[#064e3b] shadow-[0_15px_35px_rgba(0,0,0,0.4)] rounded-2xl flex items-center justify-center transform group-hover:-translate-y-2 group-hover:shadow-[0_25px_45px_rgba(0,0,0,0.5)] transition-all duration-300 border border-[#047857]">
+                      <FileSpreadsheet className="w-8 h-8 text-emerald-50" />
+                    </div>
+                    <div>
+                      <span className="text-lg font-black text-[#022c22] group-hover:text-[#059669] transition-colors">
+                        Pilih File
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status & Action */}
+              <div className={`mt-6 transition-all duration-500 ${files.length > 0 ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4 hidden'}`}>
+                
+                {/* Peringatan Jika File Tidak Sesuai (Error A3) */}
+                {uploadError && (
+                  <div className="mb-4 bg-red-50 p-4 rounded-2xl border border-red-200 flex items-start gap-3 shadow-[0_10px_20px_rgba(239,68,68,0.15)] animate-[fadeIn_0.3s_ease-out]">
+                    <div className="p-2 bg-red-100 rounded-full shrink-0">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></div>
+                    </div>
+                    <div>
+                      <h4 className="text-red-800 font-black text-sm uppercase tracking-wider">Akses Ditolak</h4>
+                      <p className="text-red-700 text-xs mt-1 font-bold leading-relaxed">{uploadError}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#064e3b] p-2 pl-5 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.5)] border border-[#047857]">
+                  <div className="flex items-center gap-4 py-2 sm:py-0">
+                    <div className="p-1.5 bg-[#10b981]/20 rounded-full">
+                      <CheckCircle className="w-6 h-6 text-[#34d399]" />
+                    </div>
+                    <div>
+                      <div className="text-white font-bold tracking-wide">{files.length} File Terdeteksi</div>
+                      <div className="text-xs text-emerald-200 font-bold">Siap untuk dieksekusi</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={processAllFiles}
+                    disabled={isProcessing}
+                    className="w-full sm:w-auto bg-[#10b981] hover:bg-[#059669] disabled:bg-emerald-800 text-white px-8 py-3.5 rounded-xl font-black flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_10px_25px_rgba(16,185,129,0.5)] hover:shadow-[0_15px_35px_rgba(16,185,129,0.7)] disabled:shadow-none"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                        Memproses {progress}%
+                      </>
+                    ) : (
+                      <>
+                        Mulai Eksekusi
+                        <ChevronRight className="w-5 h-5" />
+                      </>
+                    )}
+                  </button>
+                </div>
+                
+                {isProcessing && (
+                  <div className="mt-5 w-full bg-emerald-100 rounded-full h-3 overflow-hidden shadow-inner">
+                    <div 
+                      className="bg-[#10b981] h-full rounded-full transition-all duration-300 relative shadow-[0_0_15px_rgba(16,185,129,0.8)]" 
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {}
+        {resultData.length > 0 && (
+          <div className="bg-white rounded-3xl shadow-[0_40px_80px_-15px_rgba(0,0,0,0.7)] border border-emerald-50 overflow-hidden animate-[fadeIn_0.5s_ease-out]">
+            <div className="p-6 md:p-8 border-b border-emerald-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-[#f8fafc]">
+              <div className="flex items-center gap-4">
+                <div className="p-3.5 bg-[#064e3b] text-white rounded-xl shadow-[0_15px_30px_rgba(0,0,0,0.5)]">
+                  <FileOutput className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-[#022c22] tracking-tight">
+                    Pratinjau Hasil
+                  </h2>
+                  <p className="text-emerald-700 text-sm mt-1 font-bold">Berhasil mengekstrak <strong className="text-[#059669] font-black bg-emerald-100 px-2 py-0.5 rounded shadow-sm">{resultData.length}</strong> baris data.</p>
+                </div>
+              </div>
+              <div className="flex gap-3 w-full md:w-auto">
+                {/* Tombol Unduh berwarna Oranye seperti yang diminta */}
+                <button
+                  onClick={downloadCSV}
+                  className="flex-1 md:flex-none bg-orange-500 text-white hover:bg-orange-600 px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 text-sm shadow-[0_10px_25px_rgba(249,115,22,0.4)] hover:shadow-[0_15px_35px_rgba(249,115,22,0.6)]"
+                >
+                  <Download className="w-4 h-4" />
+                  Unduh .CSV
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left whitespace-nowrap">
+                <thead className="text-xs uppercase bg-[#064e3b] text-emerald-100">
+                  <tr>
+                    <th className="px-5 py-5 border-r border-[#047857] sticky left-0 z-10 bg-[#022c22] w-12 text-center font-black shadow-[5px_0_15px_rgba(0,0,0,0.3)]">No</th>
+                    {outputHeaders.map((h, i) => (
+                      <th key={i} className="px-5 py-5 font-bold tracking-widest text-white border-r border-[#047857] last:border-none shadow-[0_5px_15px_rgba(0,0,0,0.2)]">
+                        Kolom {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-emerald-100 text-emerald-900 bg-white">
+                  {resultData.slice(0, 10).map((row, rowIndex) => (
+                    <tr key={rowIndex} className="hover:bg-[#f0fdf4] transition-colors duration-150">
+                      <td className="px-5 py-4 border-r border-emerald-100 text-center font-black sticky left-0 text-[#059669] bg-[#f8fafc] shadow-[3px_0_10px_rgba(0,0,0,0.05)]">
+                        {rowIndex + 1}
+                      </td>
+                      {Array.from({ length: 21 }).map((_, colIndex) => (
+                        <td key={colIndex} className="px-5 py-4 font-bold border-r border-emerald-50 last:border-none">
+                          {row[colIndex] ? (
+                            <span className="text-[#022c22]">{row[colIndex]}</span>
+                          ) : (
+                            <span className="text-emerald-300 italic font-medium">-</span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {resultData.length > 10 && (
+              <div className="p-5 bg-emerald-50 text-center text-sm text-[#064e3b] font-black border-t border-emerald-200 shadow-[inset_0_10px_20px_-10px_rgba(0,0,0,0.1)]">
+                Menampilkan 10 baris pertama. Unduh file untuk melihat keseluruhan {resultData.length} data.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}} />
+    </div>
+  );
+}
