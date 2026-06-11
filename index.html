@@ -243,6 +243,9 @@
                 setUploadError('');
                 let allProcessedData = [];
                 let hasValidationError = false;
+                
+                // Variabel untuk melacak nilai duplikat pada Kolom B
+                const seenColB = new Set();
 
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
@@ -280,6 +283,18 @@
                                         const mDiff = today.getMonth() - birthDate.getMonth();
                                         if (mDiff < 0 || (mDiff === 0 && today.getDate() < birthDate.getDate())) age--;
                                         if (age >= 7 && age <= 18) skipRow = true;
+                                    }
+                                }
+                            }
+                            
+                            // Logika Hapus Duplikat berdasarkan Kolom B (index 1 pada processedDataRow)
+                            if (!skipRow) {
+                                const colBValue = String(processedDataRow[1]).trim().toLowerCase();
+                                if (colBValue !== '') {
+                                    if (seenColB.has(colBValue)) {
+                                        skipRow = true; // Jika sudah ada, lewati baris ini
+                                    } else {
+                                        seenColB.add(colBValue); // Jika belum, rekam ke dalam sistem
                                     }
                                 }
                             }
