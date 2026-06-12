@@ -1,18 +1,102 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filter CKG BLAZ</title>
-    <!-- Tailwind CSS untuk Styling -->
+    <title>CKG BLAZ | Premium Exclusive</title>
+    
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & Babel untuk Logika -->
+    
+    <!-- React & Babel untuk Logika Aplikasi (Digabung) -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
     <!-- Library XLSX untuk Excel/CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Load FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Load Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            base: '#F4F5F7', // Light grey base
+                            card: '#FFFFFF', // White for cards
+                            dark: '#111827', // Very dark for text
+                            green: '#16A34A', // Premium Base Green
+                            greenlight: '#DCFCE7', // Light Green
+                            greendark: '#15803D' // Dark Emerald Green
+                        }
+                    },
+                    animation: {
+                        'gradient-x': 'gradient-x 3s ease infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            },
+                        },
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
+        /* Custom styles for glowing effects */
+        .glow-green { box-shadow: 0 0 20px rgba(22, 163, 74, 0.3); }
+        .glow-green-hover:hover { box-shadow: 0 0 30px rgba(22, 163, 74, 0.5); }
+        .text-gradient {
+            background: linear-gradient(to right, #16A34A, #DCFCE7, #16A34A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+        }
+
+        /* Scroll Animation Classes */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .reveal-left { opacity: 0; transform: translateX(-50px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal-left.active { opacity: 1; transform: translateX(0); }
+        .reveal-right { opacity: 0; transform: translateX(50px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal-right.active { opacity: 1; transform: translateX(0); }
+        
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(22,163,74,0.4) 0%, rgba(22,163,74,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 15s infinite linear;
+        }
+
+        /* Custom Animations for App */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -20,9 +104,438 @@
         .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
     </style>
 </head>
-<body class="bg-[#dcfce7] min-h-screen selection:bg-emerald-200">
-    <div id="root"></div>
+<body class="bg-brand-base text-brand-dark font-sans antialiased overflow-x-hidden selection:bg-brand-green selection:text-white">
 
+    <!-- ============================================== -->
+    <!-- VIEW: LANDING PAGE -->
+    <!-- ============================================== -->
+    <div id="landing-view">
+        <div id="particles-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+        <!-- Navbar -->
+        <div class="fixed w-full z-50 px-4 sm:px-6 lg:px-8 top-4 transition-all duration-500 pointer-events-none" id="navbar-wrapper">
+            <nav class="max-w-7xl mx-auto backdrop-blur-xl bg-white/60 border border-white/60 shadow-[0_12px_40px_rgba(0,0,0,0.25)] rounded-3xl pointer-events-auto transition-all duration-500" id="navbar">
+                <div class="px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-20 relative">
+                        <!-- Logo -->
+                        <div class="flex-shrink-0 flex items-center cursor-pointer">
+                            <img src="https://github.com/rzcll/CKGBLAZ/blob/main/logo%20ckg%20blaz.png?raw=true" alt="CKG BLAZ Logo" class="h-10 md:h-12 object-contain drop-shadow-[0_2px_10px_rgba(22,163,74,0.3)] hover:scale-105 transition-transform duration-300">
+                        </div>
+                        
+                        <!-- Desktop Menu -->
+                        <div class="hidden md:flex space-x-3 items-center bg-white/40 backdrop-blur-md border border-white/60 shadow-[inset_0_0_10px_rgba(255,255,255,0.5),0_4px_16px_rgba(0,0,0,0.1)] px-3 py-2 rounded-full">
+                            <!-- Gold Login Button -->
+                            <button onclick="showLoginApp()" class="px-5 py-2 rounded-full text-white bg-gradient-to-r from-amber-400 to-yellow-500 shadow-[0_4px_12px_rgba(245,158,11,0.4)] hover:shadow-[0_6px_16px_rgba(245,158,11,0.6)] hover:scale-105 transition-all text-sm font-bold uppercase tracking-wider flex items-center gap-1.5 mr-1">
+                                <i class="fa-solid fa-lock text-xs"></i> Login
+                            </button>
+                            
+                            <a href="#home" class="px-5 py-2 rounded-full text-gray-800 bg-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:text-brand-greendark hover:bg-gray-50 hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] transition-all text-sm font-medium uppercase tracking-wider">Beranda</a>
+                            <a href="#pricing" class="ml-2 bg-gradient-to-r from-brand-green to-brand-greendark text-white px-6 py-2 rounded-full font-bold text-sm hover:scale-105 transition-transform shadow-[0_6px_16px_rgba(0,0,0,0.3)]">Berlangganan</a>
+                        </div>
+
+                        <!-- Mobile menu button -->
+                        <div class="md:hidden flex items-center">
+                            <button id="mobile-menu-btn" class="w-12 h-12 rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-gray-100 flex items-center justify-center text-gray-800 hover:text-brand-greendark focus:outline-none transition-all">
+                                <i class="fa-solid fa-bars text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Panel -->
+                <div id="mobile-menu" class="hidden md:hidden absolute w-full left-0 top-[110%] px-2">
+                    <div class="bg-white/80 backdrop-blur-2xl border border-white/60 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-4 space-y-3">
+                        <button onclick="showLoginApp()" class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 shadow-[0_4px_12px_rgba(245,158,11,0.4)] text-base font-bold text-white transition-all">
+                            <i class="fa-solid fa-lock"></i> Login Aplikasi
+                        </button>
+                        <a href="#home" class="block text-center px-5 py-3 rounded-2xl bg-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] text-base font-bold text-gray-800 hover:text-brand-greendark transition-all">Beranda</a>
+                        <a href="#pricing" class="block px-5 py-3 mt-4 text-center text-base font-bold bg-gradient-to-r from-brand-green to-brand-greendark text-white rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.35)]">Berlangganan Sekarang</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Hero Section -->
+        <section id="home" class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+            <!-- Background Effects -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-green/15 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center max-w-4xl mx-auto">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-green/30 bg-brand-green/10 mb-8 animate-[fadeInDown_1s_ease-out] shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+                        <span class="flex h-2 w-2 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-green opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-green"></span>
+                        </span>
+                        <span class="text-brand-greendark text-xs font-bold tracking-widest uppercase">Layanan Premium Eksklusif</span>
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-7xl font-serif font-bold mb-6 leading-tight text-gray-900 animate-[fadeInUp_1s_ease-out_0.2s_both]">
+                        Tingkatkan Pengalaman Anda dengan <br />
+                        <img src="https://github.com/rzcll/CKGBLAZ/blob/main/logo%20ckg%20blaz.png?raw=true" alt="CKG BLAZ" class="h-16 md:h-24 lg:h-32 inline-block mt-4 object-contain drop-shadow-[0_6px_20px_rgba(22,163,74,0.3)]">
+                    </h1>
+                    
+                    <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed animate-[fadeInUp_1s_ease-out_0.4s_both]">
+                        Nikmati akses tak terbatas ke layanan premium kami. Dirancang khusus untuk Anda yang menginginkan kecepatan, keamanan, dan eksklusivitas tanpa kompromi.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 animate-[fadeInUp_1s_ease-out_0.6s_both]">
+                        <a href="#pricing" class="px-8 py-4 bg-gradient-to-r from-[#16A34A] to-[#15803D] text-white font-bold rounded-full hover:scale-105 transition-all duration-300 shadow-[0_12px_25px_rgba(0,0,0,0.25)] text-lg relative overflow-hidden group">
+                            <span class="absolute top-0 left-0 w-full h-full bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out skew-x-12"></span>
+                            <span class="relative z-10">Lihat Paket Kami</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-24 relative overflow-hidden bg-brand-base">
+            <!-- Floating Elements -->
+            <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-green/10 rounded-full blur-[100px] -z-10 pointer-events-none animate-float"></div>
+            <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-green/10 rounded-full blur-[80px] -z-10 pointer-events-none animate-float delay-1000"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-brand-greendark text-sm font-bold tracking-widest uppercase mb-2">Investasi Anda</h2>
+                    <h3 class="text-3xl md:text-5xl font-serif font-bold text-gray-900 mb-4">Pilih Paket Premium Anda</h3>
+                    <p class="text-gray-600 max-w-2xl mx-auto">Pilih durasi berlangganan yang sesuai dengan kebutuhan Anda. Semakin lama berlangganan, semakin hemat investasi Anda.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-8 max-w-6xl mx-auto items-center">
+                    
+                    <!-- Package 1: 1 Month -->
+                    <div class="bg-white rounded-3xl p-8 border border-gray-200 hover:border-brand-green/80 transition-all duration-500 relative overflow-hidden group reveal-left delay-100 hover:-translate-y-2 flex flex-col shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.15)] h-full">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gray-200 group-hover:bg-brand-green transition-colors duration-300"></div>
+                        <div class="mb-8 flex-grow">
+                            <h4 class="text-xl font-serif font-bold text-gray-700 mb-2">Paket 1 Bulan</h4>
+                            <div class="flex items-baseline gap-1 mb-4">
+                                <span class="text-4xl lg:text-5xl font-bold text-gray-900">Rp 150</span>
+                                <span class="text-xl text-gray-500 font-medium">rb</span>
+                            </div>
+                        </div>
+                        <button onclick="openWaModal('Paket 1 Bulan')" class="w-full py-3.5 rounded-xl border border-gray-300 text-gray-800 font-bold hover:bg-brand-green/10 hover:border-brand-green hover:text-brand-greendark transition-all duration-300 mt-auto bg-gray-50 shadow-[0_4px_12px_rgba(0,0,0,0.08)] drop-shadow-[0_8px_16px_rgba(0,0,0,0.15)]">
+                            Pilih Paket Bulanan
+                        </button>
+                    </div>
+                    
+                    <!-- Package 3: 4 Months (Best Value - Center) -->
+                    <div class="bg-gradient-to-b from-brand-green to-brand-greendark rounded-3xl p-[2px] relative transform md:-translate-y-4 transition-all duration-500 z-10 shadow-[0_20px_40px_rgba(0,0,0,0.25)] reveal delay-300 hover:scale-[1.02] flex flex-col h-full md:h-[105%]">
+                        <div class="absolute top-0 right-8 transform -translate-y-1/2 z-20">
+                            <span class="bg-gray-900 text-white text-xs font-extrabold px-5 py-2 rounded-full shadow-[0_6px_15px_rgba(0,0,0,0.4)] uppercase tracking-wider flex items-center gap-1">
+                                <i class="fa-solid fa-star text-brand-green"></i> Paling Hemat
+                            </span>
+                        </div>
+                        <div class="bg-white rounded-[22px] p-8 h-full flex flex-col relative overflow-hidden">
+                            <div class="absolute -top-20 -right-20 w-40 h-40 bg-brand-green/10 blur-3xl rounded-full"></div>
+                            <div class="mb-8 relative z-10 flex-grow">
+                                <h4 class="text-2xl font-serif font-bold text-brand-greendark mb-2">Paket 4 Bulan</h4>
+                                <div class="flex items-baseline gap-1 mb-2">
+                                    <span class="text-5xl font-bold text-gray-900">Rp 400</span>
+                                    <span class="text-2xl text-gray-500 font-medium">rb</span>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-gray-500 line-through text-sm decoration-gray-400">Harga Normal: Rp 450.000</span>
+                                    <span class="text-brand-green text-sm font-bold animate-pulse"><i class="fa-solid fa-tag mr-1"></i> Irit Rp 50.000!</span>
+                                </div>
+                            </div>
+                            <button onclick="openWaModal('Paket 4 Bulan')" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-green to-brand-greendark text-white font-bold text-lg hover:scale-[1.03] transition-transform shadow-[0_12px_25px_rgba(0,0,0,0.3)] relative overflow-hidden group mt-auto z-10 drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)]">
+                                <span class="absolute top-0 left-0 w-full h-full bg-white/30 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out skew-x-12"></span>
+                                <span class="relative z-10">Dapatkan Sekarang</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Package 2: 2 Months -->
+                    <div class="bg-white rounded-3xl p-8 border border-gray-200 hover:border-brand-green/80 transition-all duration-500 relative overflow-hidden group reveal-right delay-200 hover:-translate-y-2 flex flex-col shadow-[0_10px_25px_rgba(0,0,0,0.08)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.15)] h-full">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gray-200 group-hover:bg-brand-green transition-colors duration-300"></div>
+                        <div class="mb-8 flex-grow">
+                            <h4 class="text-xl font-serif font-bold text-gray-700 mb-2">Paket 2 Bulan</h4>
+                            <div class="flex items-baseline gap-1 mb-4">
+                                <span class="text-4xl lg:text-5xl font-bold text-gray-900">Rp 250</span>
+                                <span class="text-xl text-gray-500 font-medium">rb</span>
+                            </div>
+                            <div class="inline-block px-3 py-1 bg-gray-100 border border-gray-200 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
+                                <p class="text-gray-600 text-xs font-bold">Lebih praktis & terjangkau</p>
+                            </div>
+                        </div>
+                        <button onclick="openWaModal('Paket 2 Bulan')" class="w-full py-3.5 rounded-xl border border-gray-300 text-gray-800 font-bold hover:bg-brand-green/10 hover:border-brand-green hover:text-brand-greendark transition-all duration-300 mt-auto bg-gray-50 shadow-[0_4px_12px_rgba(0,0,0,0.08)] drop-shadow-[0_8px_16px_rgba(0,0,0,0.15)]">
+                            Pilih Paket 2 Bulan
+                        </button>
+                    </div>
+                    
+                </div>
+                
+                <!-- Bantuan Instalasi Box -->
+                <div class="mt-12 max-w-3xl mx-auto text-center reveal delay-300 bg-gradient-to-r from-brand-green/10 via-brand-green/5 to-brand-green/10 border border-brand-green/30 rounded-2xl p-6 shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] transition-shadow">
+                    <div class="flex items-center justify-center gap-4 flex-col sm:flex-row text-gray-800">
+                        <div class="w-14 h-14 rounded-full bg-white border border-brand-green/40 flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+                            <i class="fa-solid fa-headset text-2xl text-brand-greendark"></i>
+                        </div>
+                        <p class="text-base md:text-lg font-medium text-left">
+                            Anda akan dibantu dalam <strong class="text-brand-greendark">proses instalasi aplikasi</strong> sampai aplikasi siap digunakan.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-white pt-16 pb-8 border-t border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-10">
+                    <div class="flex items-center mb-6 md:mb-0">
+                        <img src="https://github.com/rzcll/CKGBLAZ/blob/main/logo%20ckg%20blaz.png?raw=true" alt="CKG BLAZ Logo" class="h-12 md:h-16 object-contain drop-shadow-sm hover:scale-105 transition-transform duration-300">
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-brand-greendark hover:bg-brand-green/10 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_15px_rgba(0,0,0,0.1)]">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-brand-greendark hover:bg-brand-green/10 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_15px_rgba(0,0,0,0.1)]">
+                            <i class="fa-brands fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-brand-greendark hover:bg-brand-green/10 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_15px_rgba(0,0,0,0.1)]">
+                            <i class="fa-brands fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 reveal delay-200">
+                    <p class="text-gray-500 text-sm font-medium">
+                        &copy; 2026 CKG BLAZ. Seluruh Hak Cipta Dilindungi.
+                    </p>
+                    <div class="flex gap-6 text-sm text-gray-500 font-medium">
+                        <a href="#" class="hover:text-brand-greendark transition-colors">Syarat & Ketentuan</a>
+                        <a href="#" class="hover:text-brand-greendark transition-colors">Kebijakan Privasi</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Floating WhatsApp Button -->
+        <a href="https://wa.me/6281334392434?text=Halo%20Admin%20CKG%20BLAZ,%20saya%20ingin%20bertanya%20informasi%20lebih%20lanjut." target="_blank" class="fixed bottom-6 right-6 z-[90] w-16 h-16 bg-gradient-to-tr from-[#25D366] to-[#128C7E] text-white rounded-full flex items-center justify-center shadow-[0_10px_25px_rgba(37,211,102,0.4)] hover:-translate-y-2 hover:scale-110 hover:shadow-[0_15px_35px_rgba(37,211,102,0.6)] transition-all duration-300 group cursor-pointer">
+            <i class="fa-brands fa-whatsapp text-4xl"></i>
+            <span class="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-40 animate-ping -z-10 group-hover:opacity-0 transition-opacity"></span>
+        </a>
+    </div>
+
+    <!-- Modal Form WhatsApp -->
+    <div id="wa-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300 opacity-0 px-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-[0_25px_50px_rgba(0,0,0,0.25)] transform scale-95 transition-transform duration-300 relative border border-gray-100">
+            <!-- Close Button -->
+            <button id="close-modal" class="absolute top-5 right-5 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 rounded-full w-8 h-8 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4 text-brand-greendark shadow-sm border border-green-200">
+                <i class="fa-brands fa-whatsapp text-2xl"></i>
+            </div>
+            
+            <h3 class="text-2xl font-serif font-bold text-gray-900 mb-2">Lengkapi Data Anda</h3>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Anda memilih <span id="selected-package-text" class="font-bold text-brand-greendark bg-brand-green/10 px-2 py-0.5 rounded"></span>. Silakan isi form di bawah ini untuk melanjutkan pemesanan via WhatsApp.</p>
+            
+            <div class="space-y-4 mb-2">
+                <div>
+                    <label for="user-name" class="block text-sm font-bold text-gray-700 mb-1.5">Nama Lengkap</label>
+                    <input type="text" id="user-name" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition-all bg-gray-50 focus:bg-white text-gray-800" placeholder="Masukkan nama Anda">
+                </div>
+                <div>
+                    <label for="user-inst" class="block text-sm font-bold text-gray-700 mb-1.5">Nama Puskesmas / Instansi</label>
+                    <input type="text" id="user-inst" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition-all bg-gray-50 focus:bg-white text-gray-800" placeholder="Contoh: Puskesmas Melati">
+                </div>
+            </div>
+            
+            <p id="wa-error-msg" class="text-red-500 text-xs font-semibold mb-4 h-4 opacity-0 transition-opacity">Mohon lengkapi Nama dan Nama Puskesmas Anda!</p>
+            
+            <button id="btn-submit-wa" class="w-full py-4 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white font-bold text-lg hover:shadow-[0_10px_20px_rgba(37,211,102,0.3)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 drop-shadow-md">
+                <i class="fa-solid fa-paper-plane"></i> Kirim Pesan WhatsApp
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- VIEW: REACT APP / LOGIN PAGE (HIDDEN BY DEFAULT) -->
+    <!-- ============================================== -->
+    <div id="app-view" class="hidden bg-[#dcfce7] min-h-screen selection:bg-emerald-200">
+        <div id="root"></div>
+    </div>
+
+
+    <!-- Vanilla JS Scripts for Landing Page -->
+    <script>
+        // Toggle Logic Between Landing Page and React App
+        function showLoginApp() {
+            document.getElementById('landing-view').style.display = 'none';
+            document.getElementById('app-view').classList.remove('hidden');
+            document.getElementById('mobile-menu').classList.add('hidden'); // Close mobile menu if open
+            window.scrollTo(0, 0);
+        }
+
+        // Return to Landing Page Logic
+        function returnToLanding() {
+            document.getElementById('app-view').classList.add('hidden');
+            document.getElementById('landing-view').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        const navbarWrapper = document.getElementById('navbar-wrapper');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('bg-white/80', 'shadow-[0_15px_40px_rgba(0,0,0,0.35)]');
+                navbar.classList.remove('bg-white/60', 'shadow-[0_12px_40px_rgba(0,0,0,0.25)]');
+                navbarWrapper.classList.add('top-2');
+                navbarWrapper.classList.remove('top-4');
+            } else {
+                navbar.classList.remove('bg-white/80', 'shadow-[0_15px_40px_rgba(0,0,0,0.35)]');
+                navbar.classList.add('bg-white/60', 'shadow-[0_12px_40px_rgba(0,0,0,0.25)]');
+                navbarWrapper.classList.add('top-4');
+                navbarWrapper.classList.remove('top-2');
+            }
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                menu.classList.add('hidden'); 
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal, .reveal-left, .reveal-right");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal();
+
+        // Particles
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 20;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 4 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `${Math.random() * 100}vh`;
+                particle.style.animationDuration = `${Math.random() * 10 + 10}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(particle);
+            }
+        }
+        window.addEventListener('load', createParticles);
+        
+        // Modal Logic for WhatsApp Registration
+        const waModal = document.getElementById('wa-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const waSubmitBtn = document.getElementById('btn-submit-wa');
+        const userNameInput = document.getElementById('user-name');
+        const userInstInput = document.getElementById('user-inst');
+        const selectedPackageText = document.getElementById('selected-package-text');
+        const waErrorMsg = document.getElementById('wa-error-msg');
+        
+        let currentPackage = '';
+        const targetWaNumber = '6281334392434';
+
+        window.openWaModal = function(packageName) {
+            currentPackage = packageName;
+            selectedPackageText.textContent = packageName;
+            userNameInput.value = ''; 
+            userInstInput.value = '';
+            waErrorMsg.classList.remove('opacity-100');
+            waErrorMsg.classList.add('opacity-0');
+            
+            waModal.classList.remove('hidden');
+            setTimeout(() => {
+                waModal.classList.remove('opacity-0');
+                waModal.querySelector('div').classList.remove('scale-95');
+                waModal.querySelector('div').classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeWaModal() {
+            waModal.classList.add('opacity-0');
+            waModal.querySelector('div').classList.remove('scale-100');
+            waModal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                waModal.classList.add('hidden');
+            }, 300); 
+        }
+
+        closeModalBtn.addEventListener('click', closeWaModal);
+        waModal.addEventListener('click', (e) => {
+            if (e.target === waModal) closeWaModal(); 
+        });
+
+        [userNameInput, userInstInput].forEach(input => {
+            input.addEventListener('input', () => {
+                waErrorMsg.classList.remove('opacity-100');
+                waErrorMsg.classList.add('opacity-0');
+            });
+        });
+
+        waSubmitBtn.addEventListener('click', () => {
+            const name = userNameInput.value.trim();
+            const inst = userInstInput.value.trim();
+            if (!name || !inst) {
+                waErrorMsg.classList.remove('opacity-0');
+                waErrorMsg.classList.add('opacity-100');
+                return;
+            }
+            const text = `Halo Admin CKG BLAZ,\n\nPerkenalkan saya *${name}* dari *${inst}*.\nSaya tertarik dan ingin berlangganan *${currentPackage}*.\n\nMohon informasi lebih lanjut untuk proses berlangganan dan panduan instalasinya. Terima kasih.`;
+            const encodedText = encodeURIComponent(text);
+            const waUrl = `https://wa.me/${targetWaNumber}?text=${encodedText}`;
+            window.open(waUrl, '_blank');
+            closeWaModal();
+        });
+
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes fadeInDown {
+                from { opacity: 0; transform: translateY(-20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+
+    <!-- ============================================== -->
+    <!-- REACT LOGIC FOR THE FILTER APP -->
+    <!-- ============================================== -->
     <script type="text/babel">
         const { useState, useEffect } = React;
 
@@ -39,6 +552,7 @@
         const User = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
         const Save = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>;
         const LogOut = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>;
+        const ArrowLeft = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>;
 
         function App() {
             const [files, setFiles] = useState([]);
@@ -152,6 +666,9 @@
                 setInputG('');
                 setInputH('');
                 setUploadError('');
+
+                // Custom script to go back to Landing Page after App Logout
+                window.returnToLanding();
             };
 
             const handleSaveTemplate = async () => {
@@ -377,10 +894,15 @@
             // --- LAYAR LOGIN ---
             if (!isLoggedIn) {
                 return (
-                <div className="min-h-screen bg-[#dcfce7] flex items-center justify-center relative overflow-hidden font-sans p-4">
+                <div className="min-h-screen flex items-center justify-center relative overflow-hidden font-sans p-4 bg-[#dcfce7]">
                     <div className="absolute top-0 left-0 w-full h-80 bg-[#064e3b] shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-0"></div>
                     
                     <div className="bg-white p-8 md:p-10 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] w-full max-w-md relative z-10 border border-emerald-50">
+                        {/* Custom addition: Back to Landing Page Button */}
+                        <button onClick={() => window.returnToLanding()} className="absolute top-4 left-4 p-2 text-emerald-400 hover:text-[#059669] transition-colors duration-300" title="Kembali ke Beranda">
+                            <ArrowLeft className="w-6 h-6" />
+                        </button>
+
                         {/* Tombol Roda Gigi / Control Panel */}
                         <a 
                             href="https://ckgblaz-control.vercel.app/" 
@@ -452,7 +974,7 @@
 
             // --- LAYAR APLIKASI UTAMA ---
             return (
-                <div className="min-h-screen bg-[#dcfce7] relative overflow-hidden font-sans text-emerald-950 pb-16">
+                <div className="min-h-screen relative overflow-hidden font-sans text-emerald-950 pb-16">
                 
                 <div className="absolute top-0 left-0 w-full h-80 bg-[#064e3b] shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-0"></div>
 
@@ -560,7 +1082,7 @@
                                     className="w-full bg-[#064e3b] hover:bg-[#022c22] disabled:bg-emerald-800 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.4)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.5)] disabled:shadow-none"
                                     >
                                     {isSaving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                                    {saveStatus || 'Simpan Template ke DB'}
+                                    {saveStatus || 'Simpan Template'}
                                     </button>
                                 </div>
                             </div>
