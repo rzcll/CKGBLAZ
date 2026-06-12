@@ -872,6 +872,11 @@
                     return;
                 }
 
+                // Mengurutkan Kolom A (index 0) sesuai jumlah data akhir yang berhasil difilter
+                allProcessedData.forEach((row, index) => {
+                    row[0] = index + 1;
+                });
+
                 setResultData(allProcessedData);
                 setIsProcessing(false);
             };
