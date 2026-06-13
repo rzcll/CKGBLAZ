@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CKG BLAZ | Premium Exclusive</title>
     
+    <!-- Favicon (Logo pada Tab Browser) -->
+    <link rel="icon" type="image/png" href="https://github.com/rzcll/CKGBLAZ/blob/main/logo%20ckg%20blaz.png?raw=true">
+    
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -125,7 +128,7 @@
                         <!-- Desktop Menu -->
                         <div class="hidden md:flex space-x-3 items-center bg-white/40 backdrop-blur-md border border-white/60 shadow-[inset_0_0_10px_rgba(255,255,255,0.5),0_4px_16px_rgba(0,0,0,0.1)] px-3 py-2 rounded-full">
                             <!-- Gold Login Button -->
-                            <button onclick="showLoginApp()" class="px-5 py-2 rounded-full text-white bg-gradient-to-r from-amber-400 to-yellow-500 shadow-[0_4px_12px_rgba(245,158,11,0.4)] hover:shadow-[0_6px_16px_rgba(245,158,11,0.6)] hover:scale-105 transition-all text-sm font-bold uppercase tracking-wider flex items-center gap-1.5 mr-1">
+                            <button onclick="window.showLoginApp()" class="px-5 py-2 rounded-full text-white bg-gradient-to-r from-amber-400 to-yellow-500 shadow-[0_4px_12px_rgba(245,158,11,0.4)] hover:shadow-[0_6px_16px_rgba(245,158,11,0.6)] hover:scale-105 transition-all text-sm font-bold uppercase tracking-wider flex items-center gap-1.5 mr-1">
                                 <i class="fa-solid fa-lock text-xs"></i> Login
                             </button>
                             
@@ -145,7 +148,7 @@
                 <!-- Mobile Menu Panel -->
                 <div id="mobile-menu" class="hidden md:hidden absolute w-full left-0 top-[110%] px-2">
                     <div class="bg-white/80 backdrop-blur-2xl border border-white/60 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-4 space-y-3">
-                        <button onclick="showLoginApp()" class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 shadow-[0_4px_12px_rgba(245,158,11,0.4)] text-base font-bold text-white transition-all">
+                        <button onclick="window.showLoginApp()" class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 shadow-[0_4px_12px_rgba(245,158,11,0.4)] text-base font-bold text-white transition-all">
                             <i class="fa-solid fa-lock"></i> Login Aplikasi
                         </button>
                         <a href="#home" class="block text-center px-5 py-3 rounded-2xl bg-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] text-base font-bold text-gray-800 hover:text-brand-greendark transition-all">Beranda</a>
@@ -227,12 +230,10 @@
                     
                     <!-- Package 3: 4 Months (Best Value - Center) -->
                     <div class="bg-[#022c22] rounded-[40px] p-[3px] relative transform md:-translate-y-6 transition-all duration-500 ease-out z-20 shadow-[0_20px_40px_rgba(2,44,34,0.4)] hover:shadow-[0_30px_70px_rgba(245,158,11,0.15)] reveal delay-300 hover:scale-105 flex flex-col h-full md:h-[108%] group will-change-transform">
-                        <!-- Animated Border Gradient with explicit radius for perfect clipping -->
+                        <!-- Animated Border Gradient -->
                         <div class="absolute inset-0 bg-gradient-to-br from-amber-300 via-amber-600 to-yellow-200 opacity-80 group-hover:opacity-100 transition-opacity duration-500 animate-gradient-x rounded-[40px]"></div>
                         
-                        <!-- Inner Container with exact calculated radius (40px - 3px = 37px) to guarantee flawless corners -->
                         <div class="bg-[#022c22] rounded-[37px] p-8 h-full flex flex-col relative overflow-hidden z-10">
-                            <!-- Glow background -->
                             <div class="absolute -top-24 -right-24 w-64 h-64 bg-amber-500/10 blur-[60px] rounded-full group-hover:bg-amber-500/25 transition-colors duration-500 pointer-events-none"></div>
                             
                             <div class="absolute top-0 right-6 transform -translate-y-1 z-20">
@@ -389,20 +390,38 @@
 
     <!-- Vanilla JS Scripts for Landing Page -->
     <script>
-        // Toggle Logic Between Landing Page and React App
-        function showLoginApp() {
+        // Toggle Logic Between Landing Page and React App menggunakan History API
+        window.showLoginApp = function() {
+            if (window.location.hash !== '#app') {
+                history.pushState({ view: 'app' }, '', '#app');
+            }
             document.getElementById('landing-view').style.display = 'none';
             document.getElementById('app-view').classList.remove('hidden');
             document.getElementById('mobile-menu').classList.add('hidden'); // Close mobile menu if open
             window.scrollTo(0, 0);
         }
 
-        // Return to Landing Page Logic
-        function returnToLanding() {
-            document.getElementById('app-view').classList.add('hidden');
-            document.getElementById('landing-view').style.display = 'block';
-            window.scrollTo(0, 0);
+        // Return to Landing Page Logic menggunakan History API
+        window.returnToLanding = function() {
+            if (window.location.hash === '#app') {
+                history.back();
+            } else {
+                document.getElementById('app-view').classList.add('hidden');
+                document.getElementById('landing-view').style.display = 'block';
+                window.scrollTo(0, 0);
+            }
         }
+
+        // Event listener untuk tombol Back/Forward di Browser
+        window.addEventListener('popstate', (event) => {
+            if (window.location.hash === '#app') {
+                document.getElementById('landing-view').style.display = 'none';
+                document.getElementById('app-view').classList.remove('hidden');
+            } else {
+                document.getElementById('app-view').classList.add('hidden');
+                document.getElementById('landing-view').style.display = 'block';
+            }
+        });
 
         // Mobile Menu Toggle
         const btn = document.getElementById('mobile-menu-btn');
@@ -927,8 +946,15 @@
                     
                     <div className="bg-white p-8 md:p-10 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] w-full max-w-md relative z-10 border border-emerald-50">
                         {/* Custom addition: Back to Landing Page Button */}
-                        <button onClick={() => window.returnToLanding()} className="absolute top-4 left-4 p-2 text-emerald-400 hover:text-[#059669] transition-colors duration-300" title="Kembali ke Beranda">
-                            <ArrowLeft className="w-6 h-6" />
+                        <button 
+                            onClick={() => window.returnToLanding()} 
+                            className="absolute top-4 left-4 sm:top-5 sm:left-5 flex items-center gap-2 pl-2 pr-4 py-1.5 bg-white border border-emerald-100 rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-emerald-700 font-bold text-sm hover:bg-[#10b981] hover:text-white hover:border-[#10b981] hover:shadow-[0_8px_25px_rgba(16,185,129,0.4)] hover:-translate-x-1 transition-all duration-300 group z-50"
+                            title="Kembali ke Beranda"
+                        >
+                            <div className="bg-emerald-50 text-emerald-600 rounded-full p-1.5 group-hover:bg-white group-hover:text-[#10b981] transition-colors duration-300 shadow-sm">
+                                <ArrowLeft className="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform duration-300" />
+                            </div>
+                            <span className="tracking-wide">Kembali</span>
                         </button>
 
                         {/* Tombol Roda Gigi / Control Panel */}
@@ -936,7 +962,7 @@
                             href="https://ckgblaz-control.vercel.app/" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="absolute top-4 right-4 p-2 text-emerald-300 hover:text-[#059669] transition-colors duration-300"
+                            className="absolute top-5 right-5 p-2 bg-white/50 border border-emerald-50 rounded-full shadow-sm text-emerald-400 hover:text-[#059669] hover:bg-emerald-50 hover:shadow-md hover:rotate-90 transition-all duration-300"
                             title="Control Panel"
                         >
                             <svg 
@@ -955,7 +981,7 @@
                             </svg>
                         </a>
 
-                        <div className="text-center mb-8 flex flex-col items-center justify-center">
+                        <div className="text-center mb-8 flex flex-col items-center justify-center mt-4">
                             <img 
                                 src="https://github.com/rzcll/CKGBLAZ/blob/main/logo%20ckg%20blaz.png?raw=true" 
                                 alt="Logo CKG Blaz" 
