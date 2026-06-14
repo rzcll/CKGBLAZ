@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
@@ -212,13 +213,20 @@
                     </div>
                 </div>
                 
+                <!-- 
+                  PENGATURAN HARGA OTOMATIS: 
+                  Cukup ubah atribut data-normal dan data-promo di setiap kotak paket di bawah ini.
+                  Sistem otomatis akan menghitung dan mengubah: Diskon %, Harga Coret, dan Total Hemat. 
+                -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-8 max-w-6xl mx-auto items-center">
                     
                     <!-- Package 1: 1 Month -->
-                    <div class="bg-gradient-to-b from-white to-gray-50/80 rounded-[40px] p-8 border border-gray-100 hover:border-brand-green/40 transition-all duration-500 ease-out relative overflow-hidden group reveal-left delay-100 hover:-translate-y-3 flex flex-col shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(22,163,74,0.12)] h-full z-10 will-change-transform">
+                    <div class="pricing-package bg-gradient-to-b from-white to-gray-50/80 rounded-[40px] p-8 border border-gray-100 hover:border-brand-green/40 transition-all duration-500 ease-out relative overflow-hidden group reveal-left delay-100 hover:-translate-y-3 flex flex-col shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(22,163,74,0.12)] h-full z-10 will-change-transform" 
+                         data-normal="150000" data-promo="100000"> <!-- UBAH HARGA DI SINI (1 BULAN) -->
+                        
                         <!-- Badge Promo Setiap Paket -->
-                        <div class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-4 py-1.5 rounded-bl-2xl z-20 shadow-[0_4px_10px_rgba(239,68,68,0.3)] animate-pulse">
-                            PROMO JUNI - JULI
+                        <div class="price-discount-badge absolute top-0 right-0 bg-red-500 text-white text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-bl-2xl z-20 shadow-[0_4px_10px_rgba(239,68,68,0.3)] animate-pulse">
+                            PROMO JUNI-JULI • DISKON 33% <!-- Akan diganti Otomatis oleh JS -->
                         </div>
 
                         <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-all duration-500 transform group-hover:scale-110 group-hover:rotate-12 pointer-events-none">
@@ -236,16 +244,16 @@
                             <h4 class="text-2xl font-serif font-bold text-gray-800 mb-2">Paket 1 Bulan</h4>
                             
                             <div class="flex flex-col gap-1 mb-4">
-                                <span class="text-gray-400 line-through text-sm font-medium">Harga Normal: Rp 150.000</span>
+                                <span class="price-normal text-gray-400 line-through text-sm font-medium">Harga Normal: Rp 150.000</span>
                                 <div class="flex items-baseline gap-1">
-                                    <span class="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">Rp 100</span>
+                                    <span class="price-promo-big text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">Rp 100</span>
                                     <span class="text-xl text-gray-500 font-bold">rb</span>
                                 </div>
                             </div>
 
                             <div class="flex flex-col gap-1.5 mt-2">
-                                <div class="inline-flex items-center gap-2 px-3.5 py-2 bg-white rounded-xl text-sm text-brand-greendark font-bold border border-red-200 shadow-sm w-fit group-hover:bg-red-50 transition-colors text-red-600">
-                                    <i class="fa-solid fa-tags text-red-500"></i> Spesial Juni-Juli Hemat Rp 50.000!
+                                <div class="price-savings inline-flex items-center gap-2 px-3.5 py-2 bg-white rounded-xl text-xs sm:text-sm font-bold border border-red-200 shadow-sm w-fit group-hover:bg-red-50 transition-colors text-red-600" data-icon-class="fa-solid fa-tags text-red-500">
+                                    <i class="fa-solid fa-tags text-red-500"></i> Promo Hemat Rp 50.000!
                                 </div>
                             </div>
                             
@@ -256,20 +264,22 @@
                     </div>
                     
                     <!-- Package 3: 4 Months (Best Value - Center) -->
-                    <div class="bg-[#022c22] rounded-[40px] p-[3px] relative transform md:-translate-y-6 transition-all duration-500 ease-out z-20 shadow-[0_20px_40px_rgba(2,44,34,0.4)] hover:shadow-[0_30px_70px_rgba(245,158,11,0.15)] reveal delay-300 hover:scale-105 flex flex-col h-full md:h-[108%] group will-change-transform">
+                    <div class="pricing-package bg-[#022c22] rounded-[40px] p-[3px] relative transform md:-translate-y-6 transition-all duration-500 ease-out z-20 shadow-[0_20px_40px_rgba(2,44,34,0.4)] hover:shadow-[0_30px_70px_rgba(245,158,11,0.15)] reveal delay-300 hover:scale-105 flex flex-col h-full md:h-[108%] group will-change-transform"
+                         data-normal="500000" data-promo="250000"> <!-- UBAH HARGA DI SINI (4 BULAN) -->
+                        
                         <!-- Animated Border Gradient -->
                         <div class="absolute inset-0 bg-gradient-to-br from-amber-300 via-amber-600 to-yellow-200 opacity-80 group-hover:opacity-100 transition-opacity duration-500 animate-gradient-x rounded-[40px]"></div>
                         
                         <div class="bg-[#022c22] rounded-[37px] p-8 h-full flex flex-col relative overflow-hidden z-10">
                             <!-- Badge Promo Setiap Paket -->
-                            <div class="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold px-4 py-1.5 rounded-br-2xl z-20 shadow-[0_4px_10px_rgba(239,68,68,0.3)] animate-pulse">
-                                PROMO JUNI - JULI
+                            <div class="price-discount-badge absolute top-0 left-0 bg-red-500 text-white text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-br-2xl z-20 shadow-[0_4px_10px_rgba(239,68,68,0.3)] animate-pulse">
+                                PROMO JUNI-JULI • DISKON 50%
                             </div>
 
                             <div class="absolute -top-24 -right-24 w-64 h-64 bg-amber-500/10 blur-[60px] rounded-full group-hover:bg-amber-500/25 transition-colors duration-500 pointer-events-none"></div>
                             
                             <div class="absolute top-0 right-6 transform -translate-y-1 z-20">
-                                <span class="bg-gradient-to-r from-amber-400 to-yellow-500 text-gray-900 text-xs font-black px-5 py-2.5 rounded-b-xl shadow-[0_4px_15px_rgba(245,158,11,0.4)] uppercase tracking-widest flex items-center gap-1.5">
+                                <span class="bg-gradient-to-r from-amber-400 to-yellow-500 text-gray-900 text-[10px] sm:text-xs font-black px-5 py-2.5 rounded-b-xl shadow-[0_4px_15px_rgba(245,158,11,0.4)] uppercase tracking-widest flex items-center gap-1.5">
                                     <i class="fa-solid fa-crown"></i> Paling Hemat
                                 </span>
                             </div>
@@ -284,12 +294,14 @@
                                 </div>
                                 <h4 class="text-3xl font-serif font-bold text-white mb-2">Paket 4 Bulan</h4>
                                 <div class="flex items-baseline gap-1 mb-4">
-                                    <span class="text-5xl lg:text-6xl font-black text-white tracking-tight">Rp 250</span>
+                                    <span class="price-promo-big text-5xl lg:text-6xl font-black text-white tracking-tight">Rp 250</span>
                                     <span class="text-2xl text-amber-200 font-bold">rb</span>
                                 </div>
                                 <div class="flex flex-col gap-1.5 p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm mt-6 relative overflow-hidden">
-                                    <span class="text-gray-400 line-through text-sm font-medium">Harga Normal: Rp 500.000</span>
-                                    <span class="text-amber-400 text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-tags"></i> Spesial Juni-Juli Hemat Rp 250.000!</span>
+                                    <span class="price-normal text-gray-400 line-through text-sm font-medium">Harga Normal: Rp 500.000</span>
+                                    <span class="price-savings text-amber-400 text-xs sm:text-sm font-bold flex items-center gap-2" data-icon-class="fa-solid fa-tags">
+                                        <i class="fa-solid fa-tags"></i> Promo Hemat Rp 250.000!
+                                    </span>
                                 </div>
                             </div>
                             <button onclick="openWaModal('Paket 4 Bulan')" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-gray-900 font-black text-lg shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] transition-all duration-300 relative overflow-hidden mt-auto z-10 group/btn">
@@ -300,10 +312,12 @@
                     </div>
 
                     <!-- Package 2: 2 Months -->
-                    <div class="bg-gradient-to-b from-white to-emerald-50/40 rounded-[40px] p-8 border border-brand-green/20 hover:border-brand-green/50 transition-all duration-500 ease-out relative overflow-hidden group reveal-right delay-200 hover:-translate-y-3 flex flex-col shadow-[0_10px_30px_rgba(22,163,74,0.06)] hover:shadow-[0_25px_50px_rgba(22,163,74,0.15)] h-full z-10 will-change-transform">
+                    <div class="pricing-package bg-gradient-to-b from-white to-emerald-50/40 rounded-[40px] p-8 border border-brand-green/20 hover:border-brand-green/50 transition-all duration-500 ease-out relative overflow-hidden group reveal-right delay-200 hover:-translate-y-3 flex flex-col shadow-[0_10px_30px_rgba(22,163,74,0.06)] hover:shadow-[0_25px_50px_rgba(22,163,74,0.15)] h-full z-10 will-change-transform"
+                         data-normal="300000" data-promo="150000"> <!-- UBAH HARGA DI SINI (2 BULAN) -->
+                        
                         <!-- Badge Promo Setiap Paket -->
-                        <div class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-4 py-1.5 rounded-bl-2xl z-20 shadow-[0_4px_10px_rgba(239,68,68,0.3)] animate-pulse">
-                            PROMO JUNI - JULI
+                        <div class="price-discount-badge absolute top-0 right-0 bg-red-500 text-white text-[10px] sm:text-xs font-bold px-4 py-1.5 rounded-bl-2xl z-20 shadow-[0_4px_10px_rgba(239,68,68,0.3)] animate-pulse">
+                            PROMO JUNI-JULI • DISKON 50%
                         </div>
 
                         <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-all duration-500 transform group-hover:scale-110 group-hover:-rotate-12 pointer-events-none">
@@ -321,16 +335,16 @@
                             <h4 class="text-2xl font-serif font-bold text-gray-800 mb-2">Paket 2 Bulan</h4>
                             
                             <div class="flex flex-col gap-1 mb-4">
-                                <span class="text-gray-400 line-through text-sm font-medium">Harga Normal: Rp 300.000</span>
+                                <span class="price-normal text-gray-400 line-through text-sm font-medium">Harga Normal: Rp 300.000</span>
                                 <div class="flex items-baseline gap-1">
-                                    <span class="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">Rp 150</span>
+                                    <span class="price-promo-big text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">Rp 150</span>
                                     <span class="text-xl text-gray-500 font-bold">rb</span>
                                 </div>
                             </div>
                             
                             <div class="flex flex-col gap-1.5 mt-2">
-                                <div class="inline-flex items-center gap-2 px-3.5 py-2 bg-white rounded-xl text-sm text-brand-greendark font-bold border border-red-200 shadow-sm w-fit group-hover:bg-red-50 transition-colors text-red-600">
-                                    <i class="fa-solid fa-tags text-red-500"></i> Spesial Juni-Juli Hemat Rp 150.000!
+                                <div class="price-savings inline-flex items-center gap-2 px-3.5 py-2 bg-white rounded-xl text-xs sm:text-sm font-bold border border-red-200 shadow-sm w-fit group-hover:bg-red-50 transition-colors text-red-600" data-icon-class="fa-solid fa-tags text-red-500">
+                                    <i class="fa-solid fa-tags text-red-500"></i> Promo Hemat Rp 150.000!
                                 </div>
                             </div>
                         </div>
@@ -440,6 +454,42 @@
 
     <!-- Vanilla JS Scripts for Landing Page -->
     <script>
+        // === SCRIPT PERHITUNGAN HARGA OTOMATIS ===
+        function calculatePricing() {
+            const packages = document.querySelectorAll('.pricing-package');
+            packages.forEach(pkg => {
+                const normal = parseInt(pkg.getAttribute('data-normal'));
+                const promo = parseInt(pkg.getAttribute('data-promo'));
+                
+                if (!isNaN(normal) && !isNaN(promo) && normal > 0) {
+                    // Kalkulasi diskon & uang yang dihemat
+                    const discount = Math.round(((normal - promo) / normal) * 100);
+                    const savings = normal - promo;
+                    
+                    // Ambil elemen yang akan diupdate
+                    const elNormal = pkg.querySelector('.price-normal');
+                    const elPromoBig = pkg.querySelector('.price-promo-big');
+                    const elSavings = pkg.querySelector('.price-savings');
+                    const elDiscountBadge = pkg.querySelector('.price-discount-badge');
+                    
+                    // Update Text di DOM
+                    if (elNormal) elNormal.textContent = `Harga Normal: Rp ${normal.toLocaleString('id-ID')}`;
+                    if (elPromoBig) elPromoBig.textContent = `Rp ${promo / 1000}`;
+                    
+                    if (elSavings) {
+                        const iconClass = elSavings.getAttribute('data-icon-class') || 'fa-solid fa-tags';
+                        elSavings.innerHTML = `<i class="${iconClass}"></i> Promo Hemat Rp ${savings.toLocaleString('id-ID')}!`;
+                    }
+                    
+                    if (elDiscountBadge) elDiscountBadge.textContent = `PROMO JUNI-JULI • DISKON ${discount}%`;
+                }
+            });
+        }
+        
+        // Eksekusi fungsi kalkulasi harga sesaat setelah browser memuat HTML
+        window.addEventListener('DOMContentLoaded', calculatePricing);
+
+
         // Toggle Logic Between Landing Page and React App menggunakan History API
         window.showLoginApp = function() {
             if (window.location.hash !== '#app') {
