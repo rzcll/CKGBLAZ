@@ -982,7 +982,10 @@
                 let qVal = getVal(51).split(',')[0];
                 if (qVal === getVal(51) && getVal(51).includes('.')) qVal = getVal(51).split('.')[0];
                 out[16] = qVal.replace(/\D/g, '');   
-                out[17] = getVal(52).replace(/\D/g, '');   
+                
+                let rVal = getVal(52).split('.')[0];
+                out[17] = rVal.replace(/\D/g, '');   
+                
                 out[18] = getVal(55).replace(/\D/g, ''); 
                 out[19] = getVal(56).replace(/\D/g, ''); 
                 out[20] = ''; 
@@ -1045,7 +1048,9 @@
                 if (qVal === getVal(30) && getVal(30).includes('.')) qVal = getVal(30).split('.')[0];
                 out[16] = qVal.replace(/\D/g, ''); // AE ke Q
                 
-                out[17] = getVal(31).replace(/\D/g, ''); // AF ke R
+                let rValPTM = getVal(31).split('.')[0];
+                out[17] = rValPTM.replace(/\D/g, ''); // AF ke R
+                
                 out[18] = getVal(27).replace(/\D/g, ''); // AB ke S
                 out[19] = getVal(36).replace(/\D/g, ''); // AK ke T
                 out[20] = getVal(32).replace(/[^\d.,]/g, ''); // AG ke U
@@ -1159,7 +1164,7 @@
                 document.body.removeChild(link);
             };
 
-            const outputHeaders = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U"];
+            const outputHeaders = ["No", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS"];
 
             // --- LAYAR LOGIN ---
             if (!isLoggedIn) {
@@ -1480,20 +1485,28 @@
                             <table className="w-full text-sm text-left whitespace-nowrap">
                                 <thead className="text-xs uppercase bg-[#064e3b] text-emerald-100">
                                 <tr>
-                                    <th className="px-5 py-5 border-r border-[#047857] sticky left-0 z-10 bg-[#022c22] w-12 text-center font-black shadow-[5px_0_15px_rgba(0,0,0,0.3)]">No</th>
                                     {outputHeaders.map((h, i) => (
-                                    <th key={i} className="px-5 py-5 font-bold tracking-widest text-white border-r border-[#047857] last:border-none shadow-[0_5px_15px_rgba(0,0,0,0.2)]">Kolom {h}</th>
+                                        i === 0 ? (
+                                            <th key={i} className="px-5 py-5 border-r border-[#047857] sticky left-0 z-10 bg-[#022c22] w-12 text-center font-black shadow-[5px_0_15px_rgba(0,0,0,0.3)]">{h}</th>
+                                        ) : (
+                                            <th key={i} className="px-5 py-5 font-bold tracking-widest text-white border-r border-[#047857] last:border-none shadow-[0_5px_15px_rgba(0,0,0,0.2)]">{h}</th>
+                                        )
                                     ))}
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-emerald-100 text-emerald-900 bg-white">
                                 {resultData.slice(0, 10).map((row, rowIndex) => (
                                     <tr key={rowIndex} className="hover:bg-[#f0fdf4] transition-colors duration-150">
-                                    <td className="px-5 py-4 border-r border-emerald-100 text-center font-black sticky left-0 text-[#059669] bg-[#f8fafc] shadow-[3px_0_10px_rgba(0,0,0,0.05)]">{rowIndex + 1}</td>
                                     {Array.from({ length: 21 }).map((_, colIndex) => (
-                                        <td key={colIndex} className="px-5 py-4 font-bold border-r border-emerald-50 last:border-none">
-                                        {row[colIndex] ? <span className="text-[#022c22]">{row[colIndex]}</span> : <span className="text-emerald-300 italic font-medium">-</span>}
-                                        </td>
+                                        colIndex === 0 ? (
+                                            <td key={colIndex} className="px-5 py-4 border-r border-emerald-100 text-center font-black sticky left-0 text-[#059669] bg-[#f8fafc] shadow-[3px_0_10px_rgba(0,0,0,0.05)]">
+                                                {row[colIndex]}
+                                            </td>
+                                        ) : (
+                                            <td key={colIndex} className="px-5 py-4 font-bold border-r border-emerald-50 last:border-none">
+                                            {row[colIndex] ? <span className="text-[#022c22]">{row[colIndex]}</span> : <span className="text-emerald-300 italic font-medium">-</span>}
+                                            </td>
+                                        )
                                     ))}
                                     </tr>
                                 ))}
