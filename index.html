@@ -11,10 +11,10 @@
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & Babel untuk Logika Aplikasi (Digabung) -->
+    <!-- React & Babel untuk Logika Aplikasi (Digabung) - Babel dipin ke v7.20.12 untuk stabilitas JSX -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.20.12/babel.min.js"></script>
     
     <!-- Library XLSX untuk Excel/CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -721,7 +721,7 @@
     <!-- ============================================== -->
     <!-- REACT LOGIC FOR THE FILTER APP -->
     <!-- ============================================== -->
-    <script type="text/babel">
+    <script type="text/babel" data-presets="react,env">
         const { useState, useEffect } = React;
 
         // --- KOMPONEN IKON SVG ---
@@ -826,7 +826,7 @@
 
                                 setIsLoggedIn(true); 
                             } else if (resData.status === 'not_found') {
-                                setLoginError('Nama Akun tidak terdaftar di sistem!');
+                                setLoginError('Nama Akun atau Password salah!');
                             } else {
                                 setLoginError('Terjadi kesalahan pada server.');
                             }
@@ -1164,7 +1164,7 @@
                 document.body.removeChild(link);
             };
 
-            const outputHeaders = ["No", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS"];
+            const outputHeaders = ["No Urut", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS"];
 
             // --- LAYAR LOGIN ---
             if (!isLoggedIn) {
