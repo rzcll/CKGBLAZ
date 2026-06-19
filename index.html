@@ -988,7 +988,10 @@
                 
                 out[18] = getVal(55).replace(/\D/g, ''); 
                 out[19] = getVal(56).replace(/\D/g, ''); 
-                out[20] = ''; 
+                
+                const arVal = getVal(43); // Kolom AR (Indeks 43)
+                const gdaMatch = arVal.match(/gda\s*[:=\-]?\s*(\d+)/i);
+                out[20] = gdaMatch ? gdaMatch[1] : ''; 
 
                 return out;
             };
@@ -1073,9 +1076,11 @@
                         
                         if (uploadType === 'EPuskesmas') {
                             const cellA3 = (json[2] && json[2][0]) ? String(json[2][0]).trim().toLowerCase() : '';
+                            const cellCH27 = (json[26] && json[26][85]) ? String(json[26][85]).trim().toLowerCase() : '';
                             const currentAkun = akun.trim().toLowerCase();
 
-                            if (!cellA3.includes(currentAkun)) {
+                            // MODIFIKASI: Mengecek apakah nama akun ada di A3 atau CH27
+                            if (!cellA3.includes(currentAkun) && !cellCH27.includes(currentAkun)) {
                                 setUploadError('file tidak sesuai');
                                 hasValidationError = true;
                                 break; 
