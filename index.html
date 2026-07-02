@@ -644,7 +644,6 @@
             const [isProcessing, setIsProcessing] = useState(false);
             const [progress, setProgress] = useState(0);
             const [resultData, setResultData] = useState([]);
-            const [isXlsxLoaded, setIsXlsxLoaded] = useState(true); 
             const [uploadError, setUploadError] = useState('');
             const [uploadType, setUploadType] = useState('');
 
@@ -731,7 +730,7 @@
                             }
                         } catch (error) {
                             console.error('Fetch error:', error);
-                            // Fallback jika gagal fetch (misal diblokir CORS di preview)
+                            // Fallback jika gagal fetch
                             setTargetDate(null);
                             setIsLoggedIn(true);
                         }
@@ -754,8 +753,6 @@
                 setInputG('');
                 setInputH('');
                 setUploadError('');
-
-                // Custom script to go back to Landing Page after App Logout
                 window.returnToLanding();
             };
 
@@ -818,35 +815,63 @@
                 });
             };
 
+            // Fungsi baru untuk membaca SEMUA sheet dalam satu file
+            const readFileAllSheets = (file) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = window.XLSX.read(data, { type: 'array' });
+                            let allRows = [];
+                            // Loop membaca semua nama sheet
+                            workbook.SheetNames.forEach(sheetName => {
+                                const worksheet = workbook.Sheets[sheetName];
+                                const json = window.XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                                // Melewati baris ke-1 (header) pada tiap sheet agar tidak ikut di-push
+                                if (json.length > 1) {
+                                    allRows = allRows.concat(json.slice(1));
+                                }
+                            });
+                            resolve(allRows);
+                        } catch (err) {
+                            reject(err);
+                        }
+                    };
+                    reader.onerror = (err) => reject(err);
+                    reader.readAsArrayBuffer(file);
+                });
+            };
+
+            const toTitleCase = (str) => {
+                if (!str) return '';
+                return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            };
+
+            const formatDate = (val) => {
+                if (val == null || val === '') return '';
+                if (!isNaN(val) && Number(val) > 10000 && Number(val) < 80000) {
+                    const date = new Date(Math.round((Number(val) - 25569) * 86400 * 1000));
+                    const d = String(date.getUTCDate()).padStart(2, '0');
+                    const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+                    const y = String(date.getUTCFullYear());
+                    return `${d}/${m}/${y}`;
+                }
+                let str = String(val).trim();
+                if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(str)) { 
+                    const parts = str.split(/[-/]/);
+                    return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+                }
+                if (/^\d{1,2}[-/]\d{1,2}[-/]\d{4}$/.test(str)) { 
+                    const parts = str.split(/[-/]/);
+                    return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+                }
+                return str.replace(/-/g, '/');
+            };
+
             const processRow = (row) => {
                 const out = new Array(21).fill(''); 
                 const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
-
-                const toTitleCase = (str) => {
-                    if (!str) return '';
-                    return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-                };
-
-                const formatDate = (val) => {
-                    if (val == null || val === '') return '';
-                    if (!isNaN(val) && Number(val) > 10000 && Number(val) < 80000) {
-                        const date = new Date(Math.round((Number(val) - 25569) * 86400 * 1000));
-                        const d = String(date.getUTCDate()).padStart(2, '0');
-                        const m = String(date.getUTCMonth() + 1).padStart(2, '0');
-                        const y = String(date.getUTCFullYear());
-                        return `${d}/${m}/${y}`;
-                    }
-                    let str = String(val).trim();
-                    if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(str)) { 
-                        const parts = str.split(/[-/]/);
-                        return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
-                    }
-                    if (/^\d{1,2}[-/]\d{1,2}[-/]\d{4}$/.test(str)) { 
-                        const parts = str.split(/[-/]/);
-                        return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
-                    }
-                    return str.replace(/-/g, '/');
-                };
 
                 out[0] = getVal(0);     
                 out[1] = getVal(4);     
@@ -888,7 +913,7 @@
                 out[18] = getVal(55).replace(/\D/g, ''); 
                 out[19] = getVal(56).replace(/\D/g, ''); 
                 
-                const arVal = getVal(43); // Kolom AR (Indeks 43)
+                const arVal = getVal(43); 
                 const gdaMatch = arVal.match(/gda\s*[:=\-]?\s*(\d+)/i);
                 out[20] = gdaMatch ? gdaMatch[1] : ''; 
 
@@ -898,32 +923,6 @@
             const processRowSkriningPTM = (row) => {
                 const out = new Array(21).fill(''); 
                 const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
-
-                const toTitleCase = (str) => {
-                    if (!str) return '';
-                    return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-                };
-
-                const formatDate = (val) => {
-                    if (val == null || val === '') return '';
-                    if (!isNaN(val) && Number(val) > 10000 && Number(val) < 80000) {
-                        const date = new Date(Math.round((Number(val) - 25569) * 86400 * 1000));
-                        const d = String(date.getUTCDate()).padStart(2, '0');
-                        const m = String(date.getUTCMonth() + 1).padStart(2, '0');
-                        const y = String(date.getUTCFullYear());
-                        return `${d}/${m}/${y}`;
-                    }
-                    let str = String(val).trim();
-                    if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(str)) { 
-                        const parts = str.split(/[-/]/);
-                        return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
-                    }
-                    if (/^\d{1,2}[-/]\d{1,2}[-/]\d{4}$/.test(str)) { 
-                        const parts = str.split(/[-/]/);
-                        return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
-                    }
-                    return str.replace(/-/g, '/');
-                };
 
                 out[0] = ''; // No urut akan diisi di akhir
                 out[1] = getVal(2); // C ke B
@@ -960,6 +959,36 @@
                 return out;
             };
 
+            // Logika fungsi pembacaan data Data RW yang baru
+            const processRowDataRW = (row) => {
+                const out = new Array(21).fill('');
+                const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
+                
+                out[0] = ''; // No urut akan diisi di akhir
+                out[1] = getVal(1); // Kolom B ke B (Index 1)
+                out[2] = toTitleCase(getVal(2)); // Kolom C ke C (Index 2)
+                out[3] = formatDate(row[5]); // Kolom F ke D (Index 5 -> 3)
+                
+                // Kolom D ke E (Index 3 -> 4)
+                let jk = getVal(3).toLowerCase();
+                if (jk === 'pr' || jk === 'perempuan') out[4] = 'Perempuan';
+                else if (jk === 'lk' || jk === 'laki-laki' || jk === 'l' || jk === 'laki') out[4] = 'Laki-laki';
+                else out[4] = toTitleCase(getVal(3)); // jika diluar format
+
+                // Isian F - J (Index 5 - 9) sama dengan logika EPuskesmas
+                out[5] = inputF;
+                out[6] = inputG;
+                out[7] = inputH;
+                
+                // Mengambil dari file upload kolom L (Index 11) ke kolom I (Index 8) output
+                out[8] = toTitleCase(getVal(11)); 
+                
+                // Kolom J (Index 9) diambil dari kolom I (out[8]) dengan tambahan 'Desa '
+                out[9] = out[8] ? `Desa ${out[8]}` : ''; 
+                
+                return out;
+            };
+
             const processAllFiles = async () => {
                 setIsProcessing(true);
                 setUploadError('');
@@ -971,14 +1000,13 @@
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     try {
-                        const json = await readFile(file);
                         
                         if (uploadType === 'EPuskesmas') {
+                            const json = await readFile(file);
                             const cellA3 = (json[2] && json[2][0]) ? String(json[2][0]).trim().toLowerCase() : '';
                             const cellCH27 = (json[26] && json[26][85]) ? String(json[26][85]).trim().toLowerCase() : '';
                             const currentAkun = akun.trim().toLowerCase();
 
-                            // MODIFIKASI: Mengecek apakah nama akun ada di A3 atau CH27
                             if (!cellA3.includes(currentAkun) && !cellCH27.includes(currentAkun)) {
                                 setUploadError('file tidak sesuai');
                                 hasValidationError = true;
@@ -1023,13 +1051,25 @@
                                 allProcessedData.push(processedDataRow);
                             }
                         } else if (uploadType === 'SkriningPTM') {
-                            // Membaca dari array index 5 yang berarti Baris ke 6 di Excel
+                            const json = await readFile(file);
                             for (let r = 5; r < json.length; r++) {
                                 const row = json[r];
                                 if (!row || row.length === 0 || row.every(cell => cell == null || cell === '')) continue;
-                                if (row[2] == null || String(row[2]).trim() === '') continue; // Cek Kolom C tidak kosong
+                                if (row[2] == null || String(row[2]).trim() === '') continue; 
 
                                 const processedDataRow = processRowSkriningPTM(row);
+                                allProcessedData.push(processedDataRow);
+                            }
+                        } else if (uploadType === 'DataRW') {
+                            // Menggunakan fungsi readAllSheets khusus Data RW
+                            const allRows = await readFileAllSheets(file);
+                            for (let r = 0; r < allRows.length; r++) {
+                                const row = allRows[r];
+                                // Cek agar tidak memproses baris kosong atau baris dimana kolom NIK(Index 1) kosong
+                                if (!row || row.length === 0 || row.every(cell => cell == null || cell === '')) continue;
+                                if (row[1] == null || String(row[1]).trim() === '') continue;
+                                
+                                const processedDataRow = processRowDataRW(row);
                                 allProcessedData.push(processedDataRow);
                             }
                         }
@@ -1295,7 +1335,7 @@
                         <div className="lg:col-span-2 space-y-6">
                             <div className="bg-white p-7 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] flex flex-col justify-center h-full border border-emerald-50">
                                 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
                                     <label className="group relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-emerald-300 rounded-3xl bg-white hover:bg-[#f0fdf4] hover:border-[#059669] transition-all duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-md">
                                         <input
                                         type="file" multiple accept=".xlsx, .xls, .csv" onChange={(e) => handleFileSelect(e, 'EPuskesmas')}
@@ -1303,12 +1343,12 @@
                                         disabled={isProcessing}
                                         />
                                         <div className={`flex flex-col items-center space-y-4 relative z-10 ${isProcessing ? 'opacity-50' : ''}`}>
-                                            <div className="w-20 h-20 bg-gradient-to-br from-[#064e3b] to-[#022c22] shadow-[0_10px_25px_rgba(6,78,59,0.4)] rounded-2xl flex items-center justify-center transform group-hover:-translate-y-2 group-hover:scale-105 transition-all duration-300">
-                                                <FileSpreadsheet className="w-10 h-10 text-emerald-100" />
+                                            <div className="w-16 h-16 bg-gradient-to-br from-[#064e3b] to-[#022c22] shadow-[0_10px_25px_rgba(6,78,59,0.4)] rounded-2xl flex items-center justify-center transform group-hover:-translate-y-2 group-hover:scale-105 transition-all duration-300">
+                                                <FileSpreadsheet className="w-8 h-8 text-emerald-100" />
                                             </div>
                                             <div className="text-center">
-                                                <span className="block text-xl font-black text-[#022c22] group-hover:text-[#059669] transition-colors">Pelayanan EPuskesmas</span>
-                                                <span className="block text-xs text-emerald-600 mt-1 font-bold">Format .xlsx, .xls, .csv</span>
+                                                <span className="block text-lg font-black text-[#022c22] group-hover:text-[#059669] transition-colors">EPuskesmas</span>
+                                                <span className="block text-xs text-emerald-600 mt-1 font-bold">.xlsx, .xls, .csv</span>
                                             </div>
                                         </div>
                                         <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-emerald-200 rounded-full blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
@@ -1321,16 +1361,36 @@
                                         disabled={isProcessing}
                                         />
                                         <div className={`flex flex-col items-center space-y-4 relative z-10 ${isProcessing ? 'opacity-50' : ''}`}>
-                                            <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-800 shadow-[0_10px_25px_rgba(37,99,235,0.4)] rounded-2xl flex items-center justify-center transform group-hover:-translate-y-2 group-hover:scale-105 transition-all duration-300">
-                                                <FileSpreadsheet className="w-10 h-10 text-white" />
+                                            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 shadow-[0_10px_25px_rgba(37,99,235,0.4)] rounded-2xl flex items-center justify-center transform group-hover:-translate-y-2 group-hover:scale-105 transition-all duration-300">
+                                                <FileSpreadsheet className="w-8 h-8 text-white" />
                                             </div>
                                             <div className="text-center">
-                                                <span className="block text-xl font-black text-[#022c22] group-hover:text-blue-600 transition-colors">Skrining PTM</span>
-                                                <span className="block text-xs text-blue-600 mt-1 font-bold">Format .xlsx, .xls, .csv</span>
+                                                <span className="block text-lg font-black text-[#022c22] group-hover:text-blue-600 transition-colors">Skrining PTM</span>
+                                                <span className="block text-xs text-blue-600 mt-1 font-bold">.xlsx, .xls, .csv</span>
                                             </div>
                                         </div>
                                         <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-200 rounded-full blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
                                     </label>
+
+                                    {/* Tambahan Data RW Upload Box */}
+                                    <label className="group relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-violet-300 rounded-3xl bg-white hover:bg-violet-50 hover:border-violet-600 transition-all duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-md">
+                                        <input
+                                        type="file" multiple accept=".xlsx, .xls, .csv" onChange={(e) => handleFileSelect(e, 'DataRW')}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                                        disabled={isProcessing}
+                                        />
+                                        <div className={`flex flex-col items-center space-y-4 relative z-10 ${isProcessing ? 'opacity-50' : ''}`}>
+                                            <div className="w-16 h-16 bg-gradient-to-br from-violet-600 to-violet-800 shadow-[0_10px_25px_rgba(124,58,237,0.4)] rounded-2xl flex items-center justify-center transform group-hover:-translate-y-2 group-hover:scale-105 transition-all duration-300">
+                                                <FileSpreadsheet className="w-8 h-8 text-white" />
+                                            </div>
+                                            <div className="text-center">
+                                                <span className="block text-lg font-black text-[#022c22] group-hover:text-violet-600 transition-colors">Data RW</span>
+                                                <span className="block text-xs text-violet-600 mt-1 font-bold">.xlsx, .xls, .csv</span>
+                                            </div>
+                                        </div>
+                                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-violet-200 rounded-full blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
+                                    </label>
+
                                 </div>
 
                                 {/* Status Bar */}
@@ -1350,7 +1410,7 @@
                                             <div className="p-1.5 bg-[#10b981]/20 rounded-full"><CheckCircle className="w-6 h-6 text-[#34d399]" /></div>
                                             <div>
                                             <div className="text-white font-bold tracking-wide">{files.length} File Terdeteksi</div>
-                                            <div className="text-xs text-emerald-200 font-bold">Siap untuk dieksekusi</div>
+                                            <div className="text-xs text-emerald-200 font-bold">Siap untuk dieksekusi ({uploadType})</div>
                                             </div>
                                         </div>
                                         <button onClick={processAllFiles} disabled={isProcessing} className="w-full sm:w-auto bg-[#10b981] hover:bg-[#059669] disabled:bg-emerald-800 text-white px-8 py-3.5 rounded-xl font-black flex items-center justify-center gap-2 transition-all duration-300 shadow-[0_10px_25px_rgba(16,185,129,0.5)] hover:shadow-[0_15px_35px_rgba(16,185,129,0.7)] disabled:shadow-none">
