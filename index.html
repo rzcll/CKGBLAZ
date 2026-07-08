@@ -11,7 +11,7 @@
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & Babel untuk Logika Aplikasi (Digabung) - Babel dipin ke v7.20.12 untuk stabilitas JSX -->
+    <!-- React & Babel untuk Logika Aplikasi -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.20.12/babel.min.js"></script>
@@ -35,12 +35,12 @@
                     },
                     colors: {
                         brand: {
-                            base: '#F4F5F7', // Light grey base
-                            card: '#FFFFFF', // White for cards
-                            dark: '#111827', // Very dark for text
-                            green: '#16A34A', // Premium Base Green
-                            greenlight: '#DCFCE7', // Light Green
-                            greendark: '#15803D' // Dark Emerald Green
+                            base: '#F4F5F7',
+                            card: '#FFFFFF',
+                            dark: '#111827',
+                            green: '#16A34A',
+                            greenlight: '#DCFCE7',
+                            greendark: '#15803D'
                         }
                     },
                     animation: {
@@ -69,7 +69,6 @@
     </script>
     
     <style>
-        /* Custom styles for glowing effects */
         .glow-green { box-shadow: 0 0 20px rgba(22, 163, 74, 0.3); }
         .glow-green-hover:hover { box-shadow: 0 0 30px rgba(22, 163, 74, 0.5); }
         .text-gradient {
@@ -78,8 +77,6 @@
             -webkit-text-fill-color: transparent;
             background-size: 200% auto;
         }
-
-        /* Scroll Animation Classes */
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
         .reveal-left { opacity: 0; transform: translateX(-50px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
@@ -91,7 +88,6 @@
         .delay-200 { transition-delay: 200ms; }
         .delay-300 { transition-delay: 300ms; }
 
-        /* Floating particles */
         .particle {
             position: absolute;
             background: radial-gradient(circle, rgba(22,163,74,0.4) 0%, rgba(22,163,74,0) 70%);
@@ -99,8 +95,6 @@
             pointer-events: none;
             animation: float 15s infinite linear;
         }
-
-        /* Custom Animations for App */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -110,9 +104,7 @@
 </head>
 <body class="bg-brand-base text-brand-dark font-sans antialiased overflow-x-hidden selection:bg-brand-green selection:text-white">
 
-    <!-- ============================================== -->
     <!-- VIEW: LANDING PAGE -->
-    <!-- ============================================== -->
     <div id="landing-view">
         <div id="particles-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
 
@@ -121,23 +113,18 @@
             <nav class="max-w-7xl mx-auto backdrop-blur-xl bg-white/60 border border-white/60 shadow-[0_12px_40px_rgba(0,0,0,0.25)] rounded-3xl pointer-events-auto transition-all duration-500" id="navbar">
                 <div class="px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center h-20 relative">
-                        <!-- Logo -->
                         <div class="flex-shrink-0 flex items-center cursor-pointer">
                             <img src="https://github.com/rzcll/CKGBLAZ/blob/main/logo%20ckg%20blaz.png?raw=true" alt="CKG BLAZ Logo" class="h-10 md:h-12 object-contain drop-shadow-[0_2px_10px_rgba(22,163,74,0.3)] hover:scale-105 transition-transform duration-300">
                         </div>
                         
-                        <!-- Desktop Menu -->
                         <div class="hidden md:flex space-x-3 items-center bg-white/40 backdrop-blur-md border border-white/60 shadow-[inset_0_0_10px_rgba(255,255,255,0.5),0_4px_16px_rgba(0,0,0,0.1)] px-3 py-2 rounded-full">
-                            <!-- Gold Login Button -->
                             <button onclick="window.showLoginApp()" class="px-5 py-2 rounded-full text-white bg-gradient-to-r from-amber-400 to-yellow-500 shadow-[0_4px_12px_rgba(245,158,11,0.4)] hover:shadow-[0_6px_16px_rgba(245,158,11,0.6)] hover:scale-105 transition-all text-sm font-bold uppercase tracking-wider flex items-center gap-1.5 mr-1">
                                 <i class="fa-solid fa-lock text-xs"></i> Login
                             </button>
-                            
                             <a href="#home" class="px-5 py-2 rounded-full text-gray-800 bg-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:text-brand-greendark hover:bg-gray-50 hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] transition-all text-sm font-medium uppercase tracking-wider">Beranda</a>
                             <a href="#pricing" class="ml-2 bg-gradient-to-r from-brand-green to-brand-greendark text-white px-6 py-2 rounded-full font-bold text-sm hover:scale-105 transition-transform shadow-[0_6px_16px_rgba(0,0,0,0.3)]">Berlangganan</a>
                         </div>
 
-                        <!-- Mobile menu button -->
                         <div class="md:hidden flex items-center">
                             <button id="mobile-menu-btn" class="w-12 h-12 rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-gray-100 flex items-center justify-center text-gray-800 hover:text-brand-greendark focus:outline-none transition-all">
                                 <i class="fa-solid fa-bars text-xl"></i>
@@ -146,7 +133,6 @@
                     </div>
                 </div>
                 
-                <!-- Mobile Menu Panel -->
                 <div id="mobile-menu" class="hidden md:hidden absolute w-full left-0 top-[110%] px-2">
                     <div class="bg-white/80 backdrop-blur-2xl border border-white/60 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-4 space-y-3">
                         <button onclick="window.showLoginApp()" class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 shadow-[0_4px_12px_rgba(245,158,11,0.4)] text-base font-bold text-white transition-all">
@@ -159,9 +145,7 @@
             </nav>
         </div>
 
-        <!-- Hero Section -->
         <section id="home" class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-            <!-- Background Effects -->
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-green/15 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
             
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -193,14 +177,11 @@
             </div>
         </section>
 
-        <!-- Pricing Section -->
         <section id="pricing" class="py-24 relative overflow-hidden bg-brand-base">
-            <!-- Floating Elements -->
             <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-green/10 rounded-full blur-[100px] -z-10 pointer-events-none animate-float"></div>
             <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-green/10 rounded-full blur-[80px] -z-10 pointer-events-none animate-float delay-1000"></div>
             
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                
                 <div class="text-center mb-16 reveal">
                     <h2 class="text-brand-greendark text-sm font-bold tracking-widest uppercase mb-2">Investasi Anda</h2>
                     <h3 class="text-3xl md:text-5xl font-serif font-bold text-gray-900 mb-4">Pilih Paket Premium Anda</h3>
@@ -211,11 +192,9 @@
                     
                     <!-- Package 1: 1 Month -->
                     <div class="pricing-package bg-white bg-gradient-to-b from-white to-gray-50/50 rounded-[40px] p-8 border border-gray-100 hover:border-brand-green/30 border-b-[6px] border-b-transparent hover:border-b-brand-green/40 transition-all duration-500 ease-out relative overflow-hidden group reveal-left delay-100 hover:-translate-y-4 flex flex-col shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_50px_rgba(22,163,74,0.12)] h-full z-10 will-change-transform">
-                        
                         <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-all duration-500 transform group-hover:scale-125 group-hover:-rotate-12 pointer-events-none">
                             <i class="fa-solid fa-paper-plane text-8xl text-brand-green drop-shadow-md"></i>
                         </div>
-                        
                         <div class="mb-8 flex-grow relative z-10 mt-6">
                             <div class="inline-block px-4 py-1.5 bg-gray-50 rounded-full mb-6 border border-gray-200 shadow-sm relative group-hover:bg-white transition-colors">
                                 <span class="absolute -top-1.5 -left-1.5 flex h-3 w-3">
@@ -225,14 +204,12 @@
                                 <span class="text-gray-500 text-xs font-extrabold uppercase tracking-widest group-hover:text-gray-700 transition-colors">Basic</span>
                             </div>
                             <h4 class="text-2xl font-serif font-bold text-gray-800 mb-2 group-hover:text-brand-greendark transition-colors">Paket 1 Bulan</h4>
-                            
                             <div class="flex flex-col gap-1 mb-4">
                                 <div class="flex items-baseline gap-1">
                                     <span class="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">Rp 150</span>
                                     <span class="text-xl text-gray-500 font-bold">rb</span>
                                 </div>
                             </div>
-                            
                         </div>
                         <button onclick="openWaModal('Paket 1 Bulan')" class="w-full py-3.5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-bold hover:bg-brand-green hover:text-white hover:border-brand-green transition-all duration-300 mt-auto relative z-10 shadow-sm hover:shadow-[0_8px_20px_rgba(22,163,74,0.2)]">
                             Pilih Paket Bulanan
@@ -241,24 +218,16 @@
                     
                     <!-- Package 3: 4 Months (Best Value - Center) -->
                     <div class="pricing-package bg-[#022c22] rounded-[40px] p-[3px] relative transform md:-translate-y-6 transition-all duration-500 ease-out z-20 shadow-[0_20px_40px_rgba(2,44,34,0.4)] hover:shadow-[0_30px_70px_rgba(245,158,11,0.2)] reveal delay-300 hover:-translate-y-8 flex flex-col h-full md:h-[108%] group will-change-transform">
-                        
-                        <!-- BADGE PALING HEMAT -->
                         <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-30">
                             <span class="bg-gradient-to-r from-amber-400 to-yellow-500 text-gray-900 text-[10px] sm:text-xs font-black px-6 py-2 rounded-full shadow-[0_5px_15px_rgba(245,158,11,0.5)] border border-yellow-200 uppercase tracking-widest flex items-center gap-1.5 whitespace-nowrap">
                                 <i class="fa-solid fa-crown"></i> Paling Hemat
                             </span>
                         </div>
-
-                        <!-- Animated Border Gradient -->
                         <div class="absolute inset-0 bg-gradient-to-br from-amber-300 via-amber-600 to-yellow-200 opacity-80 group-hover:opacity-100 transition-opacity duration-500 animate-gradient-x rounded-[40px]"></div>
-                        
                         <div class="bg-[#022c22] rounded-[37px] p-8 h-full flex flex-col relative overflow-hidden z-10">
-                            
                             <div class="absolute -top-24 -right-24 w-64 h-64 bg-amber-500/10 blur-[60px] rounded-full group-hover:bg-amber-500/25 transition-colors duration-500 pointer-events-none"></div>
-                            
                             <div class="mb-6 flex-grow relative z-10 mt-4">
                                 <div class="flex flex-wrap items-center gap-2 mb-6">
-                                    <!-- Badge Premium Elite -->
                                     <div class="inline-block px-4 py-1.5 bg-white/10 rounded-full border border-white/20 shadow-sm backdrop-blur-md relative">
                                         <span class="absolute -top-1.5 -left-1.5 flex h-3 w-3">
                                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -267,21 +236,17 @@
                                         <span class="text-amber-300 text-xs font-extrabold uppercase tracking-widest">Premium Elite</span>
                                     </div>
                                 </div>
-                                
                                 <h4 class="text-3xl font-serif font-bold text-white mb-2 group-hover:text-amber-300 transition-colors">Paket 4 Bulan</h4>
                                 <div class="flex items-baseline gap-1 mb-2">
                                     <span class="text-5xl lg:text-6xl font-black text-white tracking-tight">Rp 400</span>
                                     <span class="text-2xl text-amber-200 font-bold">rb</span>
                                 </div>
-
-                                <!-- BADGE HEMAT (DARK THEME) -->
                                 <div class="mt-4 flex justify-start">
                                     <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/30 shadow-[0_4px_15px_rgba(245,158,11,0.15)] backdrop-blur-sm group-hover:border-amber-400/50 group-hover:shadow-[0_4px_20px_rgba(245,158,11,0.25)] transition-all">
                                         <i class="fa-solid fa-tags text-amber-400 text-sm"></i>
                                         <span class="text-amber-300 font-black text-sm tracking-wide">Anda hemat 200rb</span>
                                     </span>
                                 </div>
-                                
                             </div>
                             <button onclick="openWaModal('Paket 4 Bulan')" class="w-full py-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-gray-900 font-black text-lg shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] transition-all duration-300 relative overflow-hidden mt-auto z-10 group/btn">
                                 <span class="absolute top-0 left-0 w-full h-full bg-white/30 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out skew-x-12"></span>
@@ -292,11 +257,9 @@
 
                     <!-- Package 2: 2 Months -->
                     <div class="pricing-package bg-gradient-to-br from-white via-emerald-50/40 to-emerald-100/30 rounded-[40px] p-8 border border-brand-green/20 hover:border-brand-green/50 border-b-[6px] border-b-brand-green/80 hover:border-b-brand-green transition-all duration-500 ease-out relative overflow-hidden group reveal-right delay-200 hover:-translate-y-4 flex flex-col shadow-[0_15px_35px_rgba(22,163,74,0.08)] hover:shadow-[0_30px_60px_rgba(22,163,74,0.18)] h-full z-10 will-change-transform">
-                        
                         <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-all duration-500 transform group-hover:scale-125 group-hover:rotate-12 pointer-events-none">
                             <i class="fa-solid fa-shield-halved text-8xl text-brand-green drop-shadow-md"></i>
                         </div>
-                        
                         <div class="mb-8 flex-grow relative z-10 mt-6">
                             <div class="inline-block px-4 py-1.5 bg-brand-green/10 rounded-full mb-6 border border-brand-green/20 shadow-sm relative group-hover:bg-brand-green/20 transition-colors">
                                 <span class="absolute -top-1.5 -left-1.5 flex h-3 w-3">
@@ -306,83 +269,69 @@
                                 <span class="text-brand-greendark text-xs font-extrabold uppercase tracking-widest">Terpopuler</span>
                             </div>
                             <h4 class="text-2xl font-serif font-bold text-gray-800 mb-2 group-hover:text-brand-greendark transition-colors">Paket 2 Bulan</h4>
-                            
                             <div class="flex flex-col gap-1 mb-2">
                                 <div class="flex items-baseline gap-1">
                                     <span class="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">Rp 250</span>
                                     <span class="text-xl text-gray-500 font-bold">rb</span>
                                 </div>
                             </div>
-
-                            <!-- BADGE HEMAT (LIGHT THEME) -->
                             <div class="mt-4 flex justify-start">
                                 <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-100 to-yellow-50 border border-amber-200 shadow-sm group-hover:shadow-md group-hover:border-amber-300 transition-all">
                                     <i class="fa-solid fa-tags text-amber-500 text-sm"></i>
                                     <span class="text-amber-700 font-black text-sm tracking-wide">Anda hemat 50rb</span>
                                 </span>
                             </div>
-                            
                         </div>
                         <button onclick="openWaModal('Paket 2 Bulan')" class="w-full py-3.5 rounded-xl border-2 border-brand-green bg-white text-brand-greendark font-bold hover:bg-brand-green hover:text-white transition-all duration-300 mt-auto relative z-10 shadow-[0_4px_10px_rgba(22,163,74,0.15)] hover:shadow-[0_8px_20px_rgba(22,163,74,0.3)]">
                             Pilih Paket 2 Bulan
                         </button>
                     </div>
-                    
                 </div>
                 
-                <!-- Bantuan Instalasi Box -->
-        <div class="mt-12 max-w-3xl mx-auto text-center reveal delay-300 bg-gradient-to-r from-brand-green/10 via-brand-green/5 to-brand-green/10 border border-brand-green/30 rounded-2xl p-6 shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] transition-shadow">
-            <div class="flex items-center justify-center gap-4 flex-col sm:flex-row text-gray-800">
-                <div class="w-14 h-14 rounded-full bg-white border border-brand-green/40 flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
-                    <i class="fa-solid fa-headset text-2xl text-brand-greendark"></i>
-                </div>
-                <p class="text-base md:text-lg font-medium text-left">
-                    Anda akan dibantu dalam <strong class="text-brand-greendark">proses instalasi aplikasi</strong> sampai aplikasi siap digunakan.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Footer -->
-<footer class="bg-white py-10 border-t border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Tata Letak 3 Kolom Sejajar -->
-        <div class="flex flex-col md:flex-row justify-between items-center gap-8 reveal delay-200">
-            
-            <!-- Kiri: Logo CKG BLAZ -->
-            <div class="flex items-center shrink-0 order-1">
-                <img src="https://github.com/rzcll/CKGBLAZ/blob/main/logo%20ckg%20blaz.png?raw=true" alt="CKG BLAZ Logo" class="h-12 md:h-16 object-contain drop-shadow-sm hover:scale-105 transition-transform duration-300">
-            </div>
-            
-            <!-- Tengah: Copyright Text -->
-            <div class="text-center order-3 md:order-2">
-                <p class="text-gray-500 text-sm md:text-base font-medium">
-                    &copy; 2026 CKG BLAZ. Seluruh Hak Cipta Dilindungi.
-                </p>
-            </div>
-
-            <!-- Kanan: Informasi Bank BNI Diperbesar -->
-            <div class="shrink-0 order-2 md:order-3">
-                <div class="bg-gray-50 px-6 py-4 rounded-2xl border border-gray-200 shadow-[0_4px_15px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-lg transition-all duration-300 hover:border-brand-green/30 group">
-                    <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 shrink-0 flex items-center justify-center">
-                        <img src="https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/1200px-BNI_logo.svg.png" alt="Bank BNI" class="h-10 md:h-12 object-contain" onerror="this.src='https://placehold.co/120x35/ffffff/f97316?text=BNI'">
+                <div class="mt-12 max-w-3xl mx-auto text-center reveal delay-300 bg-gradient-to-r from-brand-green/10 via-brand-green/5 to-brand-green/10 border border-brand-green/30 rounded-2xl p-6 shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] transition-shadow">
+                    <div class="flex items-center justify-center gap-4 flex-col sm:flex-row text-gray-800">
+                        <div class="w-14 h-14 rounded-full bg-white border border-brand-green/40 flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+                            <i class="fa-solid fa-headset text-2xl text-brand-greendark"></i>
+                        </div>
+                        <p class="text-base md:text-lg font-medium text-left">
+                            Anda akan dibantu dalam <strong class="text-brand-greendark">proses instalasi aplikasi</strong> sampai aplikasi siap digunakan.
+                        </p>
                     </div>
-                    <div class="text-left">
-                        <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-1">Pembayaran Resmi</p>
-                        <div class="flex flex-col">
-                            <span class="text-gray-900 font-black text-xl md:text-2xl tracking-wide group-hover:text-brand-greendark transition-colors">1743464777</span>
-                            <span class="text-gray-500 font-bold text-sm leading-tight">a.n Mohammad Ali Agustin</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-white py-10 border-t border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-8 reveal delay-200">
+                    <div class="flex items-center shrink-0 order-1">
+                        <img src="https://github.com/rzcll/CKGBLAZ/blob/main/logo%20ckg%20blaz.png?raw=true" alt="CKG BLAZ Logo" class="h-12 md:h-16 object-contain drop-shadow-sm hover:scale-105 transition-transform duration-300">
+                    </div>
+                    <div class="text-center order-3 md:order-2">
+                        <p class="text-gray-500 text-sm md:text-base font-medium">
+                            &copy; 2026 CKG BLAZ. Seluruh Hak Cipta Dilindungi.
+                        </p>
+                    </div>
+                    <div class="shrink-0 order-2 md:order-3">
+                        <div class="bg-gray-50 px-6 py-4 rounded-2xl border border-gray-200 shadow-[0_4px_15px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-lg transition-all duration-300 hover:border-brand-green/30 group">
+                            <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-100 shrink-0 flex items-center justify-center">
+                                <img src="https://upload.wikimedia.org/wikipedia/id/thumb/5/55/BNI_logo.svg/1200px-BNI_logo.svg.png" alt="Bank BNI" class="h-10 md:h-12 object-contain" onerror="this.src='https://placehold.co/120x35/ffffff/f97316?text=BNI'">
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-1">Pembayaran Resmi</p>
+                                <div class="flex flex-col">
+                                    <span class="text-gray-900 font-black text-xl md:text-2xl tracking-wide group-hover:text-brand-greendark transition-colors">1743464777</span>
+                                    <span class="text-gray-500 font-bold text-sm leading-tight">a.n Mohammad Ali Agustin</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </footer>
 
-        </div>
-    </div>
-</footer>
-
-<!-- Floating WhatsApp Button -->
+        <!-- Floating WhatsApp Button -->
         <a href="https://wa.me/6281334392434?text=Halo%20Admin%20CKG%20BLAZ,%20saya%20ingin%20bertanya%20informasi%20lebih%20lanjut." target="_blank" class="fixed bottom-6 right-6 z-[90] w-16 h-16 bg-gradient-to-tr from-[#25D366] to-[#128C7E] text-white rounded-full flex items-center justify-center shadow-[0_10px_25px_rgba(37,211,102,0.4)] hover:-translate-y-2 hover:scale-110 hover:shadow-[0_15px_35px_rgba(37,211,102,0.6)] transition-all duration-300 group cursor-pointer">
             <i class="fa-brands fa-whatsapp text-4xl"></i>
             <span class="absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-40 animate-ping -z-10 group-hover:opacity-0 transition-opacity"></span>
@@ -392,18 +341,14 @@
     <!-- Modal Form WhatsApp -->
     <div id="wa-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300 opacity-0 px-4">
         <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-[0_25px_50px_rgba(0,0,0,0.25)] transform scale-95 transition-transform duration-300 relative border border-gray-100">
-            <!-- Close Button -->
             <button id="close-modal" class="absolute top-5 right-5 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 rounded-full w-8 h-8 flex items-center justify-center transition-colors">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            
             <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4 text-brand-greendark shadow-sm border border-green-200">
                 <i class="fa-brands fa-whatsapp text-2xl"></i>
             </div>
-            
             <h3 class="text-2xl font-serif font-bold text-gray-900 mb-2">Lengkapi Data Anda</h3>
             <p class="text-gray-500 text-sm mb-6 leading-relaxed">Anda memilih <span id="selected-package-text" class="font-bold text-brand-greendark bg-brand-green/10 px-2 py-0.5 rounded"></span>. Silakan isi form di bawah ini untuk melanjutkan pemesanan via WhatsApp.</p>
-            
             <div class="space-y-4 mb-2">
                 <div>
                     <label for="user-name" class="block text-sm font-bold text-gray-700 mb-1.5">Nama Lengkap</label>
@@ -414,37 +359,30 @@
                     <input type="text" id="user-inst" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition-all bg-gray-50 focus:bg-white text-gray-800" placeholder="Contoh: Puskesmas Melati">
                 </div>
             </div>
-            
             <p id="wa-error-msg" class="text-red-500 text-xs font-semibold mb-4 h-4 opacity-0 transition-opacity">Mohon lengkapi Nama dan Nama Puskesmas Anda!</p>
-            
             <button id="btn-submit-wa" class="w-full py-4 rounded-xl bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white font-bold text-lg hover:shadow-[0_10px_20px_rgba(37,211,102,0.3)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 drop-shadow-md">
                 <i class="fa-solid fa-paper-plane"></i> Kirim Pesan WhatsApp
             </button>
         </div>
     </div>
 
-
-    <!-- ============================================== -->
-    <!-- VIEW: REACT APP / LOGIN PAGE (HIDDEN BY DEFAULT) -->
-    <!-- ============================================== -->
+    <!-- VIEW: REACT APP / LOGIN PAGE -->
     <div id="app-view" class="hidden bg-[#dcfce7] min-h-screen selection:bg-emerald-200">
         <div id="root"></div>
     </div>
 
     <!-- Vanilla JS Scripts for Landing Page -->
     <script>
-        // Toggle Logic Between Landing Page and React App menggunakan History API
         window.showLoginApp = function() {
             if (window.location.hash !== '#app') {
                 history.pushState({ view: 'app' }, '', '#app');
             }
             document.getElementById('landing-view').style.display = 'none';
             document.getElementById('app-view').classList.remove('hidden');
-            document.getElementById('mobile-menu').classList.add('hidden'); // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
             window.scrollTo(0, 0);
         }
 
-        // Return to Landing Page Logic menggunakan History API
         window.returnToLanding = function() {
             if (window.location.hash === '#app') {
                 history.back();
@@ -455,7 +393,6 @@
             }
         }
 
-        // Event listener untuk tombol Back/Forward di Browser
         window.addEventListener('popstate', (event) => {
             if (window.location.hash === '#app') {
                 document.getElementById('landing-view').style.display = 'none';
@@ -466,7 +403,6 @@
             }
         });
 
-        // Mobile Menu Toggle
         const btn = document.getElementById('mobile-menu-btn');
         const menu = document.getElementById('mobile-menu');
 
@@ -474,7 +410,6 @@
             menu.classList.toggle('hidden');
         });
 
-        // Navbar Scroll Effect
         const navbar = document.getElementById('navbar');
         const navbarWrapper = document.getElementById('navbar-wrapper');
         window.addEventListener('scroll', () => {
@@ -491,7 +426,6 @@
             }
         });
         
-        // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -505,7 +439,6 @@
             });
         });
 
-        // Scroll Reveal Animation
         function reveal() {
             var reveals = document.querySelectorAll(".reveal, .reveal-left, .reveal-right");
             for (var i = 0; i < reveals.length; i++) {
@@ -520,7 +453,6 @@
         window.addEventListener("scroll", reveal);
         reveal();
 
-        // Particles
         function createParticles() {
             const container = document.getElementById('particles-container');
             const particleCount = 20;
@@ -539,7 +471,6 @@
         }
         window.addEventListener('load', createParticles);
         
-        // Modal Logic for WhatsApp Registration
         const waModal = document.getElementById('wa-modal');
         const closeModalBtn = document.getElementById('close-modal');
         const waSubmitBtn = document.getElementById('btn-submit-wa');
@@ -617,13 +548,10 @@
         document.head.appendChild(style);
     </script>
 
-    <!-- ============================================== -->
     <!-- REACT LOGIC FOR THE FILTER APP -->
-    <!-- ============================================== -->
     <script type="text/babel" data-presets="react,env">
         const { useState, useEffect } = React;
 
-        // --- KOMPONEN IKON SVG ---
         const FolderUp = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-1.22-1.8A2 2 0 0 0 8.53 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v6"/><path d="m9 13 3-3 3 3"/></svg>;
         const FileSpreadsheet = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M8 9h2"/></svg>;
         const Download = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>;
@@ -662,7 +590,6 @@
             const [targetDate, setTargetDate] = useState(null);
             const [timeLeft, setTimeLeft] = useState({ months: 0, days: 0 });
 
-            // URL Google Apps Script Anda
             const GAS_URL = 'https://script.google.com/macros/s/AKfycbya7z3VYbd6gGpLkw2OxCH8U8I3bxuJBf2Zgjhb_cYFgr1mAKwqA0FGvRSEp8Uq_Owo_Q/exec'; 
 
             useEffect(() => {
@@ -730,7 +657,6 @@
                             }
                         } catch (error) {
                             console.error('Fetch error:', error);
-                            // Fallback jika gagal fetch
                             setTargetDate(null);
                             setIsLoggedIn(true);
                         }
@@ -815,7 +741,6 @@
                 });
             };
 
-            // Fungsi baru untuk membaca SEMUA sheet dalam satu file
             const readFileAllSheets = (file) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -824,11 +749,9 @@
                             const data = new Uint8Array(e.target.result);
                             const workbook = window.XLSX.read(data, { type: 'array' });
                             let allRows = [];
-                            // Loop membaca semua nama sheet
                             workbook.SheetNames.forEach(sheetName => {
                                 const worksheet = workbook.Sheets[sheetName];
                                 const json = window.XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                                // Melewati baris ke-1 (header) pada tiap sheet agar tidak ikut di-push
                                 if (json.length > 1) {
                                     allRows = allRows.concat(json.slice(1));
                                 }
@@ -924,67 +847,100 @@
                 const out = new Array(21).fill(''); 
                 const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
 
-                out[0] = ''; // No urut akan diisi di akhir
-                out[1] = getVal(2); // C ke B
-                out[2] = toTitleCase(getVal(3)); // D ke C
-                out[3] = formatDate(row[4]); // E ke D
-                out[4] = getVal(5); // F ke E
+                out[0] = ''; 
+                out[1] = getVal(2); 
+                out[2] = toTitleCase(getVal(3)); 
+                out[3] = formatDate(row[4]); 
+                out[4] = getVal(5); 
                 out[5] = inputF;
                 out[6] = inputG;
                 out[7] = inputH;
                 
                 const iVal = getVal(8);
                 const parsedDesa = toTitleCase(iVal.split('-')[0].trim());
-                out[8] = parsedDesa; // I ke I (teks sebelum -)
-                out[9] = parsedDesa ? 'Desa ' + parsedDesa : ''; // I ke J (tambah 'Desa')
+                out[8] = parsedDesa; 
+                out[9] = parsedDesa ? 'Desa ' + parsedDesa : ''; 
 
                 const diagCols = [getVal(14), getVal(15), getVal(16), getVal(17)].map(s => s.toLowerCase());
 
-                out[13] = diagCols.some(s => s.includes('hipertensi')) ? 'Ya' : 'Tidak'; // O,P,Q,R ke N
-                out[14] = diagCols.some(s => s.includes('diabetes')) ? 'Ya' : 'Tidak';   // O,P,Q,R ke O
+                out[13] = diagCols.some(s => s.includes('hipertensi')) ? 'Ya' : 'Tidak'; 
+                out[14] = diagCols.some(s => s.includes('diabetes')) ? 'Ya' : 'Tidak';   
 
-                out[15] = getVal(29).replace(/\D/g, ''); // AD ke P
+                out[15] = getVal(29).replace(/\D/g, ''); 
                 
                 let qVal = getVal(30).split(',')[0];
                 if (qVal === getVal(30) && getVal(30).includes('.')) qVal = getVal(30).split('.')[0];
-                out[16] = qVal.replace(/\D/g, ''); // AE ke Q
+                out[16] = qVal.replace(/\D/g, ''); 
                 
                 let rValPTM = getVal(31).split('.')[0];
-                out[17] = rValPTM.replace(/\D/g, ''); // AF ke R
+                out[17] = rValPTM.replace(/\D/g, ''); 
                 
-                out[18] = getVal(27).replace(/\D/g, ''); // AB ke S
-                out[19] = getVal(36).replace(/\D/g, ''); // AK ke T
-                out[20] = getVal(32).replace(/[^\d.,]/g, ''); // AG ke U
+                out[18] = getVal(27).replace(/\D/g, ''); 
+                out[19] = getVal(36).replace(/\D/g, ''); 
+                out[20] = getVal(32).replace(/[^\d.,]/g, ''); 
 
                 return out;
             };
 
-            // Logika fungsi pembacaan data Data RW yang baru
             const processRowDataRW = (row) => {
                 const out = new Array(21).fill('');
                 const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
                 
-                out[0] = ''; // No urut akan diisi di akhir
-                out[1] = getVal(1); // Kolom B ke B (Index 1)
-                out[2] = toTitleCase(getVal(2)); // Kolom C ke C (Index 2)
-                out[3] = formatDate(row[5]); // Kolom F ke D (Index 5 -> 3)
+                out[0] = ''; 
+                out[1] = getVal(1); 
+                out[2] = toTitleCase(getVal(2)); 
+                out[3] = formatDate(row[5]); 
                 
-                // Kolom D ke E (Index 3 -> 4)
                 let jk = getVal(3).toLowerCase();
                 if (jk === 'pr' || jk === 'perempuan') out[4] = 'Perempuan';
                 else if (jk === 'lk' || jk === 'laki-laki' || jk === 'l' || jk === 'laki') out[4] = 'Laki-laki';
-                else out[4] = toTitleCase(getVal(3)); // jika diluar format
+                else out[4] = toTitleCase(getVal(3)); 
 
-                // Isian F - J (Index 5 - 9) sama dengan logika EPuskesmas
                 out[5] = inputF;
                 out[6] = inputG;
                 out[7] = inputH;
                 
-                // Mengambil dari file upload kolom L (Index 11) ke kolom I (Index 8) output
                 out[8] = toTitleCase(getVal(11)); 
-                
-                // Kolom J (Index 9) diambil dari kolom I (out[8]) dengan tambahan 'Desa '
                 out[9] = out[8] ? `Desa ${out[8]}` : ''; 
+                
+                return out;
+            };
+
+            const processRowDataBanyuwangi = (row) => {
+                const out = new Array(21).fill('');
+                const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
+                
+                out[0] = ''; // No urut akan diisi di akhir
+                out[1] = getVal(0); // Kolom A ke B (Index 1)
+                out[2] = toTitleCase(getVal(1)); // Kolom B ke C (Index 2)
+                out[3] = formatDate(row[2]); // Kolom C ke D (Index 3)
+                
+                // Kolom E (Index 4) ke E (Index 4) -> Jenis Kelamin
+                let jk = getVal(4).toLowerCase();
+                if (jk === 'pr' || jk === 'perempuan') out[4] = 'Perempuan';
+                else if (jk === 'lk' || jk === 'laki-laki' || jk === 'l' || jk === 'laki') out[4] = 'Laki-laki';
+                else out[4] = toTitleCase(getVal(4)); 
+
+                out[5] = inputF;
+                out[6] = inputG;
+                out[7] = inputH;
+                
+                // Logika Kolom I (Kelurahan) berdasarkan kolom F upload
+                const fUpload = getVal(5).toLowerCase(); // Upload F (Index 5)
+                
+                let valI = '';
+                // 1. Pengecekan Kedungringin (F: tratas, krajan, kedungringin)
+                if (fUpload.includes('tratas') || fUpload.includes('krajan') || fUpload.includes('kedungringin')) {
+                    valI = 'Kedungringin';
+                }
+                // 2. Pengecekan Kedungrejo (F: kalimati, muncar, krajan, sampangan, stoplas)
+                else if (fUpload.includes('kalimati') || fUpload.includes('muncar') || fUpload.includes('krajan') || fUpload.includes('sampangan') || fUpload.includes('stoplas')) {
+                    valI = 'Kedungrejo';
+                }
+                out[8] = toTitleCase(valI); // Output I (Index 8)
+                
+                // Upload F (Index 5) -> Output J (Index 9)
+                out[9] = toTitleCase(getVal(5)); 
                 
                 return out;
             };
@@ -1000,7 +956,6 @@
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     try {
-                        
                         if (uploadType === 'EPuskesmas') {
                             const json = await readFile(file);
                             const cellA3 = (json[2] && json[2][0]) ? String(json[2][0]).trim().toLowerCase() : '';
@@ -1061,15 +1016,25 @@
                                 allProcessedData.push(processedDataRow);
                             }
                         } else if (uploadType === 'DataRW') {
-                            // Menggunakan fungsi readAllSheets khusus Data RW
                             const allRows = await readFileAllSheets(file);
                             for (let r = 0; r < allRows.length; r++) {
                                 const row = allRows[r];
-                                // Cek agar tidak memproses baris kosong atau baris dimana kolom NIK(Index 1) kosong
                                 if (!row || row.length === 0 || row.every(cell => cell == null || cell === '')) continue;
                                 if (row[1] == null || String(row[1]).trim() === '') continue;
                                 
                                 const processedDataRow = processRowDataRW(row);
+                                allProcessedData.push(processedDataRow);
+                            }
+                        } else if (uploadType === 'DataBanyuwangi') {
+                            const allRows = await readFileAllSheets(file);
+                            for (let r = 0; r < allRows.length; r++) {
+                                const row = allRows[r];
+                                if (!row || row.length === 0 || row.every(cell => cell == null || cell === '')) continue;
+                                // Pada Data Banyuwangi, sesuai fungsi di atas, NIK berada di kolom A (Index 0).
+                                // Jadi pastikan kolom A tidak kosong sebelum memproses baris.
+                                if (row[0] == null || String(row[0]).trim() === '') continue;
+                                
+                                const processedDataRow = processRowDataBanyuwangi(row);
                                 allProcessedData.push(processedDataRow);
                             }
                         }
@@ -1086,7 +1051,6 @@
                     return;
                 }
 
-                // Mengurutkan Kolom A (index 0) sesuai jumlah data akhir yang berhasil difilter
                 allProcessedData.forEach((row, index) => {
                     row[0] = index + 1;
                 });
@@ -1110,14 +1074,12 @@
 
             const outputHeaders = ["No Urut", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS"];
 
-            // --- LAYAR LOGIN ---
             if (!isLoggedIn) {
                 return (
                 <div className="min-h-screen flex items-center justify-center relative overflow-hidden font-sans p-4 bg-[#dcfce7]">
                     <div className="absolute top-0 left-0 w-full h-80 bg-[#064e3b] shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-0"></div>
                     
                     <div className="bg-white p-8 md:p-10 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] w-full max-w-md relative z-10 border border-emerald-50">
-                        {/* Custom addition: Back to Landing Page Button */}
                         <button 
                             onClick={() => window.returnToLanding()} 
                             className="absolute top-4 left-4 sm:top-5 sm:left-5 flex items-center gap-2 pl-2 pr-4 py-1.5 bg-white border border-emerald-100 rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.05)] text-emerald-700 font-bold text-sm hover:bg-[#10b981] hover:text-white hover:border-[#10b981] hover:shadow-[0_8px_25px_rgba(16,185,129,0.4)] hover:-translate-x-1 transition-all duration-300 group z-50"
@@ -1129,7 +1091,6 @@
                             <span className="tracking-wide">Kembali</span>
                         </button>
 
-                        {/* Tombol Roda Gigi / Control Panel */}
                         <a 
                             href="https://ckgblaz-control.vercel.app/" 
                             target="_blank" 
@@ -1215,7 +1176,6 @@
                 );
             }
 
-            // --- LAYAR APLIKASI UTAMA ---
             return (
                 <div className="min-h-screen relative overflow-hidden font-sans text-emerald-950 pb-16">
                 
@@ -1223,7 +1183,6 @@
 
                 <div className="max-w-6xl mx-auto space-y-8 p-6 relative z-10 pt-8">
                     
-                    {/* Header Profil & Logout */}
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-2">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-[#10b981]/20 rounded-lg border border-[#34d399]/30">
@@ -1283,8 +1242,8 @@
                         </div>
                     </div>
 
+                    {}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Kolom Kiri */}
                         <div className="lg:col-span-1 space-y-6">
                             <div className="bg-white p-7 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] h-full flex flex-col border border-emerald-50">
                                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-emerald-100">
@@ -1293,7 +1252,7 @@
                                     </div>
                                     <div>
                                     <h3 className="text-lg font-bold text-[#022c22]">Sisipkan Data</h3>
-                                    <p className="text-xs text-emerald-600 font-bold">Lengkapi dan sesuaikan data Provinsi, Kabupaten dan Kecamatan</p>
+                                    <p className="text-xs text-emerald-600 font-bold">Lengkapi data Provinsi, Kabupaten dan Kecamatan</p>
                                     </div>
                                 </div>
                                 
@@ -1331,11 +1290,10 @@
                             </div>
                         </div>
 
-                        {/* Kolom Kanan */}
                         <div className="lg:col-span-2 space-y-6">
                             <div className="bg-white p-7 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] flex flex-col justify-center h-full border border-emerald-50">
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
                                     <label className="group relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-emerald-300 rounded-3xl bg-white hover:bg-[#f0fdf4] hover:border-[#059669] transition-all duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-md">
                                         <input
                                         type="file" multiple accept=".xlsx, .xls, .csv" onChange={(e) => handleFileSelect(e, 'EPuskesmas')}
@@ -1372,7 +1330,6 @@
                                         <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-200 rounded-full blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
                                     </label>
 
-                                    {/* Tambahan Data RW Upload Box */}
                                     <label className="group relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-violet-300 rounded-3xl bg-white hover:bg-violet-50 hover:border-violet-600 transition-all duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-md">
                                         <input
                                         type="file" multiple accept=".xlsx, .xls, .csv" onChange={(e) => handleFileSelect(e, 'DataRW')}
@@ -1391,9 +1348,26 @@
                                         <div className="absolute -top-10 -right-10 w-32 h-32 bg-violet-200 rounded-full blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
                                     </label>
 
+                                    <label className="group relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-rose-300 rounded-3xl bg-white hover:bg-rose-50 hover:border-rose-600 transition-all duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-md">
+                                        <input
+                                        type="file" multiple accept=".xlsx, .xls, .csv" onChange={(e) => handleFileSelect(e, 'DataBanyuwangi')}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                                        disabled={isProcessing}
+                                        />
+                                        <div className={`flex flex-col items-center space-y-4 relative z-10 ${isProcessing ? 'opacity-50' : ''}`}>
+                                            <div className="w-16 h-16 bg-gradient-to-br from-rose-500 to-rose-700 shadow-[0_10px_25px_rgba(244,63,94,0.4)] rounded-2xl flex items-center justify-center transform group-hover:-translate-y-2 group-hover:scale-105 transition-all duration-300">
+                                                <FileSpreadsheet className="w-8 h-8 text-white" />
+                                            </div>
+                                            <div className="text-center">
+                                                <span className="block text-lg font-black text-[#022c22] group-hover:text-rose-600 transition-colors">Data Banyuwangi</span>
+                                                <span className="block text-xs text-rose-600 mt-1 font-bold">.xlsx, .xls, .csv</span>
+                                            </div>
+                                        </div>
+                                        <div className="absolute -top-10 -left-10 w-32 h-32 bg-rose-200 rounded-full blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
+                                    </label>
+
                                 </div>
 
-                                {/* Status Bar */}
                                 <div className={`mt-6 transition-all duration-500 ${files.length > 0 ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4 hidden'}`}>
                                     {uploadError && (
                                     <div className="mb-4 bg-red-50 p-4 rounded-2xl border border-red-200 flex items-start gap-3 shadow-[0_10px_20px_rgba(239,68,68,0.15)] animate-fadeIn">
@@ -1427,7 +1401,7 @@
                         </div>
                     </div>
 
-                    {/* Tabel Hasil */}
+                    {}
                     {resultData.length > 0 && (
                     <div className="bg-white rounded-3xl shadow-[0_40px_80px_-15px_rgba(0,0,0,0.7)] border border-emerald-50 overflow-hidden animate-fadeIn">
                         <div className="p-6 md:p-8 border-b border-emerald-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-[#f8fafc]">
