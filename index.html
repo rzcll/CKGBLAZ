@@ -8,7 +8,6 @@
     <!-- Favicon (Logo pada Tab Browser) -->
     <link rel="icon" type="image/png" href="https://github.com/rzcll/CKGBLAZ/blob/main/Logo%20z%20CKG%20BLAZ.png?raw=true">
     
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- React & Babel untuk Logika Aplikasi -->
@@ -906,42 +905,32 @@
                 return out;
             };
 
-            const processRowDataBanyuwangi = (row) => {
-                const out = new Array(21).fill('');
+            // Logika CKG BLAZ: Kolom B pada file (index 1) masuk ke NIK (index 1), Kolom C ke Nama (index 2), dst.
+            const processRowCKGBLAZ = (row) => {
+                const out = new Array(26).fill(''); 
                 const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
                 
-                out[0] = ''; // No urut akan diisi di akhir
-                out[1] = getVal(0); // Kolom A ke B (Index 1)
-                out[2] = toTitleCase(getVal(1)); // Kolom B ke C (Index 2)
-                out[3] = formatDate(row[2]); // Kolom C ke D (Index 3)
+                out[0] = ''; // Dikosongkan dulu untuk No Urut
                 
-                // Kolom E (Index 4) ke E (Index 4) -> Jenis Kelamin
-                let jk = getVal(4).toLowerCase();
-                if (jk === 'pr' || jk === 'perempuan') out[4] = 'Perempuan';
-                else if (jk === 'lk' || jk === 'laki-laki' || jk === 'l' || jk === 'laki') out[4] = 'Laki-laki';
-                else out[4] = toTitleCase(getVal(4)); 
+                // Looping pengisian default dari index 1 (Kolom B) hingga index 25 (Kolom Z)
+                for(let i = 1; i < 26; i++) {
+                    out[i] = getVal(i);
+                }
 
-                out[5] = inputF;
-                out[6] = inputG;
-                out[7] = inputH;
+                // --- Logika disamakan dengan EPuskesmas ---
+                // Format Tanggal Lahir (Membaca sumber file Kolom D / Index 3)
+                out[3] = formatDate(row[3]); 
+
+                // Provinsi, Kabupaten, Kecamatan (Menggunakan form Sisipkan Data)
+                out[5] = inputF; 
+                out[6] = inputG; 
+                out[7] = inputH; 
                 
-                // Logika Kolom I (Kelurahan) berdasarkan kolom F upload
-                const fUpload = getVal(5).toLowerCase(); // Upload F (Index 5)
-                
-                let valI = '';
-                // 1. Pengecekan Kedungringin (F: tratas, krajan, kedungringin)
-                if (fUpload.includes('tratas') || fUpload.includes('krajan') || fUpload.includes('kedungringin')) {
-                    valI = 'Kedungringin';
-                }
-                // 2. Pengecekan Kedungrejo (F: kalimati, muncar, krajan, sampangan, stoplas)
-                else if (fUpload.includes('kalimati') || fUpload.includes('muncar') || fUpload.includes('krajan') || fUpload.includes('sampangan') || fUpload.includes('stoplas')) {
-                    valI = 'Kedungrejo';
-                }
-                out[8] = toTitleCase(valI); // Output I (Index 8)
-                
-                // Upload F (Index 5) -> Output J (Index 9)
-                out[9] = toTitleCase(getVal(5)); 
-                
+                // Kelurahan & Alamat (Membaca sumber file Kolom I / Index 8)
+                const kelurahan = toTitleCase(getVal(8));
+                out[8] = kelurahan;
+                out[9] = kelurahan ? `Desa ${kelurahan}` : '';
+
                 return out;
             };
 
@@ -1025,16 +1014,14 @@
                                 const processedDataRow = processRowDataRW(row);
                                 allProcessedData.push(processedDataRow);
                             }
-                        } else if (uploadType === 'DataBanyuwangi') {
+                        } else if (uploadType === 'CKGBLAZ') {
                             const allRows = await readFileAllSheets(file);
                             for (let r = 0; r < allRows.length; r++) {
                                 const row = allRows[r];
-                                if (!row || row.length === 0 || row.every(cell => cell == null || cell === '')) continue;
-                                // Pada Data Banyuwangi, sesuai fungsi di atas, NIK berada di kolom A (Index 0).
-                                // Jadi pastikan kolom A tidak kosong sebelum memproses baris.
-                                if (row[0] == null || String(row[0]).trim() === '') continue;
+                                // Apabila baris kosong atau NIK (Kolom B / Index 1) kosong, maka abaikan baris ini (mencegah baris hantu)
+                                if (!row || row.length === 0 || row[1] == null || String(row[1]).trim() === '') continue;
                                 
-                                const processedDataRow = processRowDataBanyuwangi(row);
+                                const processedDataRow = processRowCKGBLAZ(row);
                                 allProcessedData.push(processedDataRow);
                             }
                         }
@@ -1052,6 +1039,7 @@
                 }
 
                 allProcessedData.forEach((row, index) => {
+                    // Berikan nomor urut untuk semua jenis upload
                     row[0] = index + 1;
                 });
 
@@ -1059,8 +1047,15 @@
                 setIsProcessing(false);
             };
 
+            // Headers generator dinamis disesuaikan dengan jenis Upload beserta Header Gambar
+            const currentHeaders = uploadType === 'CKGBLAZ'
+                ? ["No Urut", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS", "No WA", "NIK Wali", "Nama Wali", "Tanggal Lahir Wali", "JK Wali"]
+                : ["No Urut", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS"];
+            
+            const currentColumnCount = currentHeaders.length;
+
             const downloadCSV = () => {
-                const worksheet = window.XLSX.utils.aoa_to_sheet(resultData);
+                const worksheet = window.XLSX.utils.aoa_to_sheet([currentHeaders, ...resultData]);
                 const csvOutput = window.XLSX.utils.sheet_to_csv(worksheet);
                 const blob = new Blob([csvOutput], { type: "text/csv;charset=utf-8;" });
                 const url = URL.createObjectURL(blob);
@@ -1071,8 +1066,6 @@
                 link.click();
                 document.body.removeChild(link);
             };
-
-            const outputHeaders = ["No Urut", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS"];
 
             if (!isLoggedIn) {
                 return (
@@ -1242,7 +1235,6 @@
                         </div>
                     </div>
 
-                    {}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-1 space-y-6">
                             <div className="bg-white p-7 rounded-3xl shadow-[0_30px_60px_-10px_rgba(0,0,0,0.6)] h-full flex flex-col border border-emerald-50">
@@ -1350,7 +1342,7 @@
 
                                     <label className="group relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-rose-300 rounded-3xl bg-white hover:bg-rose-50 hover:border-rose-600 transition-all duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-md">
                                         <input
-                                        type="file" multiple accept=".xlsx, .xls, .csv" onChange={(e) => handleFileSelect(e, 'DataBanyuwangi')}
+                                        type="file" multiple accept=".xlsx, .xls, .csv" onChange={(e) => handleFileSelect(e, 'CKGBLAZ')}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
                                         disabled={isProcessing}
                                         />
@@ -1359,7 +1351,7 @@
                                                 <FileSpreadsheet className="w-8 h-8 text-white" />
                                             </div>
                                             <div className="text-center">
-                                                <span className="block text-lg font-black text-[#022c22] group-hover:text-rose-600 transition-colors">Data Banyuwangi</span>
+                                                <span className="block text-lg font-black text-[#022c22] group-hover:text-rose-600 transition-colors">CKG BLAZ</span>
                                                 <span className="block text-xs text-rose-600 mt-1 font-bold">.xlsx, .xls, .csv</span>
                                             </div>
                                         </div>
@@ -1423,7 +1415,7 @@
                             <table className="w-full text-sm text-left whitespace-nowrap">
                                 <thead className="text-xs uppercase bg-[#064e3b] text-emerald-100">
                                 <tr>
-                                    {outputHeaders.map((h, i) => (
+                                    {currentHeaders.map((h, i) => (
                                         i === 0 ? (
                                             <th key={i} className="px-5 py-5 border-r border-[#047857] sticky left-0 z-10 bg-[#022c22] w-12 text-center font-black shadow-[5px_0_15px_rgba(0,0,0,0.3)]">{h}</th>
                                         ) : (
@@ -1435,14 +1427,15 @@
                                 <tbody className="divide-y divide-emerald-100 text-emerald-900 bg-white">
                                 {resultData.slice(0, 10).map((row, rowIndex) => (
                                     <tr key={rowIndex} className="hover:bg-[#f0fdf4] transition-colors duration-150">
-                                    {Array.from({ length: 21 }).map((_, colIndex) => (
+                                    {Array.from({ length: currentColumnCount }).map((_, colIndex) => (
                                         colIndex === 0 ? (
-                                            <td key={colIndex} className="px-5 py-4 border-r border-emerald-100 text-center font-black sticky left-0 text-[#059669] bg-[#f8fafc] shadow-[3px_0_10px_rgba(0,0,0,0.05)]">
-                                                {row[colIndex]}
+                                            <td key={colIndex} className="px-5 py-4 border-r border-emerald-100 sticky left-0 bg-[#f8fafc] shadow-[3px_0_10px_rgba(0,0,0,0.05)] text-center font-black text-[#059669]">
+                                                {row[colIndex] ? row[colIndex] : ''}
                                             </td>
                                         ) : (
                                             <td key={colIndex} className="px-5 py-4 font-bold border-r border-emerald-50 last:border-none">
-                                            {row[colIndex] ? <span className="text-[#022c22]">{row[colIndex]}</span> : <span className="text-emerald-300 italic font-medium">-</span>}
+                                            {/* Tidak ada karakter garis setrip (kosong murni) jika datanya kosong */}
+                                            {row[colIndex] ? <span className="text-[#022c22]">{row[colIndex]}</span> : ''}
                                             </td>
                                         )
                                     ))}
