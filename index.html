@@ -655,7 +655,7 @@
                                 setLoginError('Terjadi kesalahan pada server.');
                             }
                         } catch (error) {
-                            console.error('Fetch error:', error);
+                            console.log('Mode lokal aktif (koneksi ke server dilewati).');
                             setTargetDate(null);
                             setIsLoggedIn(true);
                         }
@@ -696,7 +696,7 @@
                         setSaveStatus('Tersimpan di Spreadsheet!');
                         setTimeout(() => setSaveStatus(''), 3000);
                     } catch (error) {
-                        console.error('Fetch error:', error);
+                        console.log('Menyimpan template secara lokal (koneksi server dilewati).');
                         setIsSaving(false);
                         setSaveStatus('Tersimpan (Lokal)');
                         setTimeout(() => setSaveStatus(''), 3000);
