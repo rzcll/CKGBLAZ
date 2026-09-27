@@ -842,6 +842,59 @@
                 return out;
             };
 
+            // Memproses Data sesuai Ekstraksi EPuskesmas namun dalam formasi Tabel 26 Kolom (Seperti CKG BLAZ)
+            const processRowEpusNew = (row) => {
+                const out = new Array(26).fill(''); 
+                const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
+
+                out[0] = getVal(0);     
+                out[1] = getVal(4);     
+                out[2] = toTitleCase(getVal(2)); 
+                out[3] = formatDate(row[17]); 
+                out[4] = getVal(8);     
+                out[5] = inputF;        
+                out[6] = inputG;        
+                out[7] = inputH;        
+                out[8] = toTitleCase(getVal(15));    
+
+                const pVal = toTitleCase(getVal(15));
+                out[9] = pVal ? `Desa ${pVal}` : '';  
+                out[12] = getVal(37);   
+
+                const bl = getVal(63).toUpperCase();
+                const bo = getVal(66).toUpperCase();
+                const br = getVal(69).toUpperCase();
+                const diagCols = [bl, bo, br];
+
+                const nMatches = [];
+                const nRegex = /(I10|I11)/ig;
+                diagCols.forEach(d => { const matches = d.match(nRegex); if (matches) nMatches.push(...matches); });
+                out[13] = nMatches.length > 0 ? 'Ya' : 'Tidak';
+
+                const oMatches = [];
+                const oRegex = /E11(\.[1-9])?/ig;
+                diagCols.forEach(d => { const matches = d.match(oRegex); if (matches) oMatches.push(...matches); });
+                out[14] = oMatches.length > 0 ? 'Ya' : 'Tidak';
+
+                out[15] = getVal(50).replace(/\D/g, '');   
+                let qVal = getVal(51).split(',')[0];
+                if (qVal === getVal(51) && getVal(51).includes('.')) qVal = getVal(51).split('.')[0];
+                out[16] = qVal.replace(/\D/g, '');   
+                
+                let rVal = getVal(52).split('.')[0];
+                out[17] = rVal.replace(/\D/g, '');   
+                
+                out[18] = getVal(55).replace(/\D/g, ''); 
+                out[19] = getVal(56).replace(/\D/g, ''); 
+                
+                const arVal = getVal(43); 
+                const gdaMatch = arVal.match(/gda\s*[:=\-]?\s*(\d+)/i);
+                out[20] = gdaMatch ? gdaMatch[1] : ''; 
+
+                // Indeks 21 hingga 25 dibiarkan kosong sesuai requirement
+                return out;
+            };
+
             const processRowSkriningPTM = (row) => {
                 const out = new Array(21).fill(''); 
                 const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
@@ -881,52 +934,21 @@
                 return out;
             };
 
-            const processRowDataRW = (row) => {
-                const out = new Array(21).fill('');
-                const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
-                
-                out[0] = ''; 
-                out[1] = getVal(1); 
-                out[2] = toTitleCase(getVal(2)); 
-                out[3] = formatDate(row[5]); 
-                
-                let jk = getVal(3).toLowerCase();
-                if (jk === 'pr' || jk === 'perempuan') out[4] = 'Perempuan';
-                else if (jk === 'lk' || jk === 'laki-laki' || jk === 'l' || jk === 'laki') out[4] = 'Laki-laki';
-                else out[4] = toTitleCase(getVal(3)); 
-
-                out[5] = inputF;
-                out[6] = inputG;
-                out[7] = inputH;
-                
-                out[8] = toTitleCase(getVal(11)); 
-                out[9] = out[8] ? `Desa ${out[8]}` : ''; 
-                
-                return out;
-            };
-
-            // Logika CKG BLAZ: Kolom B pada file (index 1) masuk ke NIK (index 1), Kolom C ke Nama (index 2), dst.
             const processRowCKGBLAZ = (row) => {
                 const out = new Array(26).fill(''); 
                 const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
                 
                 out[0] = ''; // Dikosongkan dulu untuk No Urut
                 
-                // Looping pengisian default dari index 1 (Kolom B) hingga index 25 (Kolom Z)
                 for(let i = 1; i < 26; i++) {
                     out[i] = getVal(i);
                 }
 
-                // --- Logika disamakan dengan EPuskesmas ---
-                // Format Tanggal Lahir (Membaca sumber file Kolom D / Index 3)
                 out[3] = formatDate(row[3]); 
-
-                // Provinsi, Kabupaten, Kecamatan (Menggunakan form Sisipkan Data)
                 out[5] = inputF; 
                 out[6] = inputG; 
                 out[7] = inputH; 
                 
-                // Kelurahan & Alamat (Membaca sumber file Kolom I / Index 8)
                 const kelurahan = toTitleCase(getVal(8));
                 out[8] = kelurahan;
                 out[9] = kelurahan ? `Desa ${kelurahan}` : '';
@@ -945,7 +967,7 @@
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     try {
-                        if (uploadType === 'EPuskesmas') {
+                        if (uploadType === 'EPuskesmas' || uploadType === 'EPUSNEW') {
                             const json = await readFile(file);
                             const cellA3 = (json[2] && json[2][0]) ? String(json[2][0]).trim().toLowerCase() : '';
                             const cellCH27 = (json[26] && json[26][85]) ? String(json[26][85]).trim().toLowerCase() : '';
@@ -962,7 +984,7 @@
                                 if (!row || row.length === 0 || row.every(cell => cell == null || cell === '')) continue;
                                 if (row[4] == null || String(row[4]).trim() === '') continue;
                                 
-                                const processedDataRow = processRow(row);
+                                const processedDataRow = uploadType === 'EPUSNEW' ? processRowEpusNew(row) : processRow(row);
                                 
                                 let skipRow = false;
                                 const dobString = processedDataRow[3];
@@ -1004,21 +1026,10 @@
                                 const processedDataRow = processRowSkriningPTM(row);
                                 allProcessedData.push(processedDataRow);
                             }
-                        } else if (uploadType === 'DataRW') {
-                            const allRows = await readFileAllSheets(file);
-                            for (let r = 0; r < allRows.length; r++) {
-                                const row = allRows[r];
-                                if (!row || row.length === 0 || row.every(cell => cell == null || cell === '')) continue;
-                                if (row[1] == null || String(row[1]).trim() === '') continue;
-                                
-                                const processedDataRow = processRowDataRW(row);
-                                allProcessedData.push(processedDataRow);
-                            }
                         } else if (uploadType === 'CKGBLAZ') {
                             const allRows = await readFileAllSheets(file);
                             for (let r = 0; r < allRows.length; r++) {
                                 const row = allRows[r];
-                                // Apabila baris kosong atau NIK (Kolom B / Index 1) kosong, maka abaikan baris ini (mencegah baris hantu)
                                 if (!row || row.length === 0 || row[1] == null || String(row[1]).trim() === '') continue;
                                 
                                 const processedDataRow = processRowCKGBLAZ(row);
@@ -1039,7 +1050,6 @@
                 }
 
                 allProcessedData.forEach((row, index) => {
-                    // Berikan nomor urut untuk semua jenis upload
                     row[0] = index + 1;
                 });
 
@@ -1047,8 +1057,7 @@
                 setIsProcessing(false);
             };
 
-            // Headers generator dinamis disesuaikan dengan jenis Upload beserta Header Gambar
-            const currentHeaders = uploadType === 'CKGBLAZ'
+            const currentHeaders = (uploadType === 'CKGBLAZ' || uploadType === 'EPUSNEW')
                 ? ["No Urut", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS", "No WA", "NIK Wali", "Nama Wali", "Tanggal Lahir Wali", "JK Wali"]
                 : ["No Urut", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS"];
             
@@ -1322,9 +1331,10 @@
                                         <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-200 rounded-full blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
                                     </label>
 
+                                    {/* EPUS NEW Button replaces Data RW */}
                                     <label className="group relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-violet-300 rounded-3xl bg-white hover:bg-violet-50 hover:border-violet-600 transition-all duration-300 cursor-pointer overflow-hidden shadow-sm hover:shadow-md">
                                         <input
-                                        type="file" multiple accept=".xlsx, .xls, .csv" onChange={(e) => handleFileSelect(e, 'DataRW')}
+                                        type="file" multiple accept=".xlsx, .xls, .csv" onChange={(e) => handleFileSelect(e, 'EPUSNEW')}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
                                         disabled={isProcessing}
                                         />
@@ -1333,7 +1343,7 @@
                                                 <FileSpreadsheet className="w-8 h-8 text-white" />
                                             </div>
                                             <div className="text-center">
-                                                <span className="block text-lg font-black text-[#022c22] group-hover:text-violet-600 transition-colors">Data RW</span>
+                                                <span className="block text-lg font-black text-[#022c22] group-hover:text-violet-600 transition-colors">EPUS NEW</span>
                                                 <span className="block text-xs text-violet-600 mt-1 font-bold">.xlsx, .xls, .csv</span>
                                             </div>
                                         </div>
@@ -1357,7 +1367,6 @@
                                         </div>
                                         <div className="absolute -top-10 -left-10 w-32 h-32 bg-rose-200 rounded-full blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
                                     </label>
-
                                 </div>
 
                                 <div className={`mt-6 transition-all duration-500 ${files.length > 0 ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-4 hidden'}`}>
