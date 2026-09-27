@@ -895,8 +895,9 @@
                 return out;
             };
 
+            // Memproses Data Skrining PTM dalam formasi Tabel 26 Kolom (Seperti CKG BLAZ)
             const processRowSkriningPTM = (row) => {
-                const out = new Array(21).fill(''); 
+                const out = new Array(26).fill(''); 
                 const getVal = (colIdx) => row[colIdx] != null ? String(row[colIdx]).trim() : '';
 
                 out[0] = ''; 
@@ -931,6 +932,7 @@
                 out[19] = getVal(36).replace(/\D/g, ''); 
                 out[20] = getVal(32).replace(/[^\d.,]/g, ''); 
 
+                // Indeks 21 hingga 25 dibiarkan kosong
                 return out;
             };
 
@@ -1057,7 +1059,8 @@
                 setIsProcessing(false);
             };
 
-            const currentHeaders = (uploadType === 'CKGBLAZ' || uploadType === 'EPUSNEW')
+            // Semua output sekarang menggunakan 26 Kolom kecuali EPuskesmas biasa
+            const currentHeaders = (uploadType === 'CKGBLAZ' || uploadType === 'EPUSNEW' || uploadType === 'SkriningPTM')
                 ? ["No Urut", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS", "No WA", "NIK Wali", "Nama Wali", "Tanggal Lahir Wali", "JK Wali"]
                 : ["No Urut", "NIK", "Nama", "Tanggal Lahir", "Jenis Kelamin", "Provinsi", "Kabupaten", "Kecamatan", "Kelurahan", "Alamat", "Status Nikah", "Pekerjaan", "Riw Merokok", "Riw HT", "Riw DM", "TB", "BB", "LP", "Sistole", "Diastole", "GDS"];
             
