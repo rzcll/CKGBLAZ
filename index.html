@@ -1117,7 +1117,10 @@
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement("a");
                 link.href = url;
-                link.setAttribute("download", "DataCKGUmum.csv");
+                
+                const fileName = uploadType === 'CKG SEKOLAH' ? "Datasekolah.csv" : "DataCKGUmum.csv";
+                link.setAttribute("download", fileName);
+                
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
